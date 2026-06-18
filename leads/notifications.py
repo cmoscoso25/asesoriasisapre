@@ -97,7 +97,7 @@ def notificar_asesor(lead):
     </div>
     """
 
-    from_email = os.environ.get('RESEND_FROM_EMAIL', 'onboarding@resend.dev')
+    from_email = os.environ.get('RESEND_FROM_EMAIL', 'leads@asesoriasisapres.com')
     payload = {
         "from": from_email,
         "to": destinatarios,
