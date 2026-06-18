@@ -12,6 +12,7 @@
     cargas: null,
     clinica: null,
     preferencia: null,
+    region: null,
     ahorro_min: 0,
     ahorro_max: 0,
     isapres: [],
@@ -22,9 +23,9 @@
   // isapre_actual solo se muestra si el usuario viene de una isapre
   function getSteps() {
     if (['isapre-cara', 'isapre-subio'].includes(state.situacion)) {
-      return ['situacion', 'isapre_actual', 'renta', 'cargas', 'preferencia', 'clinica'];
+      return ['situacion', 'isapre_actual', 'renta', 'cargas', 'preferencia', 'clinica', 'region'];
     }
-    return ['situacion', 'renta', 'cargas', 'preferencia', 'clinica'];
+    return ['situacion', 'renta', 'cargas', 'preferencia', 'clinica', 'region'];
   }
 
   function goNext() {
@@ -149,6 +150,7 @@
       case 'cargas':        renderCargas(card);       break;
       case 'preferencia':   renderPreferencia(card);  break;
       case 'clinica':       renderClinica(card);      break;
+      case 'region':        renderRegion(card);       break;
       default:              renderResultado(card);    break;
     }
   }
@@ -226,13 +228,13 @@
       <div class="calc-options calc-options--grid">${optionsHTML}</div>
       <div class="form-group" style="margin-top:16px;">
         <label for="pago-actual" style="font-size:14px;font-weight:600;color:#334155;">
-          ¿Cuánto pagas actualmente? (opcional)
+          ¿Cuánto pagas actualmente? <span style="font-weight:400;color:#64748b;">(un aproximado está bien)</span>
         </label>
         <input type="number" id="pago-actual" class="form-input"
                placeholder="Ej: 180000" inputmode="numeric" min="0" max="5000000"
                value="${state.pago_actual || ''}"
                style="margin-top:6px;">
-        <small style="color:#64748b;font-size:12px;">CLP mensual incluyendo cargas</small>
+        <small style="color:#64748b;font-size:12px;">CLP/mes incluyendo cargas · mientras más exacto, mejor tu diagnóstico</small>
       </div>
       <div class="calc-nav">
         <button class="btn-back" id="btn-back-isapre">← Volver</button>
@@ -403,6 +405,59 @@
     document.getElementById('btn-back-cli').addEventListener('click', goBack);
     document.getElementById('btn-next-cli').addEventListener('click', function () {
       if (!state.clinica) return;
+      goNext();
+    });
+  }
+
+  // ── Paso región ──
+  const REGIONES = [
+    { val: 'rm',   label: 'Región Metropolitana' },
+    { val: 'v',    label: 'Valparaíso' },
+    { val: 'viii', label: 'Biobío' },
+    { val: 'ix',   label: 'La Araucanía' },
+    { val: 'xiv',  label: 'Los Ríos' },
+    { val: 'x',    label: 'Los Lagos' },
+    { val: 'vi',   label: "O'Higgins" },
+    { val: 'vii',  label: 'Maule' },
+    { val: 'xvi',  label: 'Ñuble' },
+    { val: 'xi',   label: 'Aysén' },
+    { val: 'xii',  label: 'Magallanes' },
+    { val: 'iv',   label: 'Coquimbo' },
+    { val: 'iii',  label: 'Atacama' },
+    { val: 'ii',   label: 'Antofagasta' },
+    { val: 'i',    label: 'Tarapacá' },
+    { val: 'xv',   label: 'Arica y Parinacota' },
+  ];
+
+  function renderRegion(card) {
+    const optsHTML = REGIONES.map(r =>
+      `<option value="${r.val}"${state.region === r.val ? ' selected' : ''}>${r.label}</option>`
+    ).join('');
+
+    document.getElementById('calc-body').innerHTML = `
+      <p class="calc-question">¿En qué región estás?</p>
+      <div class="form-group" style="margin-top:8px;">
+        <select id="region-select" class="form-input" style="margin-top:0;">
+          <option value="">Selecciona tu región</option>
+          ${optsHTML}
+        </select>
+      </div>
+      <div class="calc-nav">
+        <button class="btn-back" id="btn-back-region">← Volver</button>
+        <button class="btn-next" id="btn-next-region" ${!state.region ? 'disabled' : ''}>
+          Ver mi diagnóstico →
+        </button>
+      </div>
+    `;
+
+    document.getElementById('region-select').addEventListener('change', function () {
+      state.region = this.value || null;
+      document.getElementById('btn-next-region').disabled = !state.region;
+    });
+
+    document.getElementById('btn-back-region').addEventListener('click', goBack);
+    document.getElementById('btn-next-region').addEventListener('click', function () {
+      if (!state.region) return;
 
       const diag = calcularDiagnostico(
         state.renta, state.cargas, state.situacion, state.clinica, state.pago_actual
@@ -423,6 +478,7 @@
           cargas:           state.cargas,
           clinica:          state.clinica,
           preferencia:      state.preferencia,
+          region:           state.region,
           ahorro_min:       diag.ahorroMin,
           ahorro_max:       diag.ahorroMax,
           isapres:          state.isapres,
@@ -438,7 +494,7 @@
         });
       }
 
-      state.currentStep = getSteps().length; // más allá del último paso → resultado
+      state.currentStep = getSteps().length;
       renderPaso();
     });
   }

@@ -51,6 +51,8 @@ def nuevo_lead(request):
             lead.prevision_actual = diag.get('prevision_actual') or ''
             lead.pago_actual      = diag.get('pago_actual')
             lead.preferencia      = diag.get('preferencia')      or ''
+            if not lead.region:
+                lead.region       = diag.get('region')           or ''
             lead.ahorro_estimado_min = diag.get('ahorro_min')
             lead.ahorro_estimado_max = diag.get('ahorro_max')
             lead.isapres_recomendadas = diag.get('isapres') or []
@@ -93,6 +95,7 @@ def guardar_diagnostico(request):
             'cargas':           data.get('cargas')           or '',
             'clinica':          data.get('clinica')          or '',
             'preferencia':      data.get('preferencia')      or '',
+            'region':           data.get('region')           or '',
             'ahorro_min':       data.get('ahorro_min'),
             'ahorro_max':       data.get('ahorro_max'),
             'isapres':          data.get('isapres')          or [],
