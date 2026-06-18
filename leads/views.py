@@ -41,9 +41,9 @@ def nuevo_lead(request):
         lead.renta = diag.get('renta')
         lead.cargas = diag.get('cargas', '')
         lead.clinica_preferente = diag.get('clinica', '')
-        lead.prevision_actual = diag.get('prevision_actual', '')
+        lead.prevision_actual = diag.get('prevision_actual') or ''
         lead.pago_actual = diag.get('pago_actual')
-        lead.preferencia = diag.get('preferencia', '')
+        lead.preferencia = diag.get('preferencia') or ''
         lead.ahorro_estimado_min = diag.get('ahorro_min')
         lead.ahorro_estimado_max = diag.get('ahorro_max')
         lead.isapres_recomendadas = diag.get('isapres', [])
@@ -73,12 +73,12 @@ def guardar_diagnostico(request):
         data = json.loads(request.body)
         request.session['diagnostico'] = {
             'situacion': data.get('situacion', ''),
-            'prevision_actual': data.get('prevision_actual', ''),
+            'prevision_actual': data.get('prevision_actual') or '',
             'pago_actual': data.get('pago_actual'),
             'renta': data.get('renta'),
-            'cargas': data.get('cargas', ''),
-            'clinica': data.get('clinica', ''),
-            'preferencia': data.get('preferencia', ''),
+            'cargas': data.get('cargas') or '',
+            'clinica': data.get('clinica') or '',
+            'preferencia': data.get('preferencia') or '',
             'ahorro_min': data.get('ahorro_min'),
             'ahorro_max': data.get('ahorro_max'),
             'isapres': data.get('isapres', []),
