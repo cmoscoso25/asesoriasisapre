@@ -123,6 +123,40 @@ CACHES = {
 
 TAWKTO_ID = os.environ.get('TAWKTO_ID', '')
 
+# Logging a consola (visible en Render logs independiente de DEBUG)
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'simple': {
+            'format': '[{levelname}] {asctime} {name}: {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'WARNING',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'WARNING',
+            'propagate': False,
+        },
+        'leads': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+    },
+}
+
 # Content Security Policy
 CSP_DEFAULT_SRC     = ("'self'",)
 CSP_SCRIPT_SRC      = ("'self'", "'unsafe-inline'", "https://embed.tawk.to", "https://va.tawk.to")
