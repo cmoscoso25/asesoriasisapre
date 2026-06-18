@@ -41,9 +41,18 @@ def nuevo_lead(request):
         lead.renta = diag.get('renta')
         lead.cargas = diag.get('cargas', '')
         lead.clinica_preferente = diag.get('clinica', '')
+        lead.prevision_actual = diag.get('prevision_actual', '')
+        lead.pago_actual = diag.get('pago_actual')
+        lead.preferencia = diag.get('preferencia', '')
         lead.ahorro_estimado_min = diag.get('ahorro_min')
         lead.ahorro_estimado_max = diag.get('ahorro_max')
         lead.isapres_recomendadas = diag.get('isapres', [])
+
+        try:
+            edad_val = int(request.POST.get('edad-input', 0))
+            lead.edad = edad_val if 18 <= edad_val <= 100 else None
+        except (ValueError, TypeError):
+            pass
 
         lead.save()
         cache.set(cache_key, intentos + 1, 600)
@@ -64,9 +73,12 @@ def guardar_diagnostico(request):
         data = json.loads(request.body)
         request.session['diagnostico'] = {
             'situacion': data.get('situacion', ''),
+            'prevision_actual': data.get('prevision_actual', ''),
+            'pago_actual': data.get('pago_actual'),
             'renta': data.get('renta'),
             'cargas': data.get('cargas', ''),
             'clinica': data.get('clinica', ''),
+            'preferencia': data.get('preferencia', ''),
             'ahorro_min': data.get('ahorro_min'),
             'ahorro_max': data.get('ahorro_max'),
             'isapres': data.get('isapres', []),

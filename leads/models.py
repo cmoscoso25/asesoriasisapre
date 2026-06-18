@@ -1,6 +1,22 @@
 from django.db import models
 
 class Lead(models.Model):
+    PREVISION_CHOICES = [
+        ('fonasa',        'Fonasa'),
+        ('banmedica',     'Banmédica'),
+        ('colmena',       'Colmena'),
+        ('consalud',      'Consalud'),
+        ('cruzblanca',    'Cruz Blanca'),
+        ('masvida',       'MasVida'),
+        ('vidatres',      'Vida Tres'),
+        ('nueva_masvida', 'Nueva MásVida'),
+        ('esencial',      'Esencial'),
+    ]
+    PREFERENCIA_CHOICES = [
+        ('economica', 'Más económica'),
+        ('cobertura', 'Mayor cobertura'),
+        ('equilibrio', 'Equilibrio precio/cobertura'),
+    ]
     SITUACION_CHOICES = [
         ('fonasa', 'Viene de Fonasa'),
         ('isapre-cara', 'Isapre muy cara'),
@@ -48,6 +64,11 @@ class Lead(models.Model):
     renta = models.IntegerField(null=True, blank=True, help_text='Renta imponible mensual en CLP')
     cargas = models.CharField(max_length=20, choices=CARGAS_CHOICES, blank=True)
     clinica_preferente = models.CharField(max_length=20, choices=CLINICA_CHOICES, blank=True)
+
+    edad = models.PositiveSmallIntegerField(null=True, blank=True, verbose_name='Edad')
+    prevision_actual = models.CharField(max_length=20, choices=PREVISION_CHOICES, blank=True, verbose_name='Previsión actual')
+    pago_actual = models.IntegerField(null=True, blank=True, verbose_name='Pago actual (CLP/mes)')
+    preferencia = models.CharField(max_length=20, choices=PREFERENCIA_CHOICES, blank=True, verbose_name='Preferencia')
 
     ahorro_estimado_min = models.IntegerField(null=True, blank=True)
     ahorro_estimado_max = models.IntegerField(null=True, blank=True)

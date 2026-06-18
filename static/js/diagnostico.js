@@ -1,34 +1,52 @@
-/* Diagnóstico Isapre — 4 pasos + resultado + formulario */
+/* Diagnóstico Isapre — flujo dinámico + resultado + formulario */
 (function () {
   'use strict';
 
   // ── Estado global del diagnóstico ──
   const state = {
-    paso: 1,
+    currentStep: 0,
     situacion: null,
+    prevision_actual: null,
+    pago_actual: null,
     renta: 700000,
     cargas: null,
     clinica: null,
+    preferencia: null,
     ahorro_min: 0,
     ahorro_max: 0,
     isapres: [],
     diagnostico: null,
   };
 
-  // ── Constantes Chile 2026 ──
-  const UF = 39300;                         // UF junio 2026 (referencial)
-  const TOPE_RENTA = Math.round(81.6 * UF); // Tope imponible: ~$3.207.480
+  // ── Pasos dinámicos según situación ──
+  // isapre_actual solo se muestra si el usuario viene de una isapre
+  function getSteps() {
+    if (['isapre-cara', 'isapre-subio'].includes(state.situacion)) {
+      return ['situacion', 'isapre_actual', 'renta', 'cargas', 'preferencia', 'clinica'];
+    }
+    return ['situacion', 'renta', 'cargas', 'preferencia', 'clinica'];
+  }
 
-  // Factores adicionales promedio por cargas (cónyuge tramo 25-49 = 1.0; hijos prom tramo 5-17 = 0.49)
+  function goNext() {
+    state.currentStep++;
+    renderPaso();
+  }
+  function goBack() {
+    if (state.currentStep > 0) state.currentStep--;
+    renderPaso();
+  }
+
+  // ── Constantes Chile 2026 ──
+  const UF = 39300;
+  const TOPE_RENTA = Math.round(81.6 * UF);
+
   function factorCargas(cargas) {
     if (cargas === 'pareja')         return 1.00;
-    if (cargas === 'familia-chica')  return 1.00 + 0.49;        // cónyuge + 1 hijo prom
-    if (cargas === 'familia-grande') return 1.00 + 0.49 * 2.5;  // cónyuge + 2.5 hijos prom
+    if (cargas === 'familia-chica')  return 1.00 + 0.49;
+    if (cargas === 'familia-grande') return 1.00 + 0.49 * 2.5;
     return 0;
   }
 
-  // Planes reales por clínica preferente (precio base en UF titular, tramo 25-49)
-  // Fuentes: isapres360.cl, isapresyseguros.com, queplan.cl, quvi.cl — junio 2026
   const PLANES_DB = {
     'sin-preferencia': [
       { isapre: 'Nueva Masvida', plan: 'Plan Libre',               precio_uf: 0.80, dot: '#F59E0B' },
@@ -47,10 +65,10 @@
       { isapre: 'Banmédica',     plan: 'Signo Preferente Alemana',    precio_uf: 2.20, dot: '#0C447C' },
     ],
     'las-condes': [
-      { isapre: 'Cruz Blanca',   plan: 'Total Salud Las Condes',      precio_uf: 1.55, dot: '#185FA5' },
-      { isapre: 'Colmena',       plan: 'Las Condes Premium',          precio_uf: 1.65, dot: '#1D9E75' },
+      { isapre: 'Cruz Blanca',   plan: 'Total Salud Las Condes',        precio_uf: 1.55, dot: '#185FA5' },
+      { isapre: 'Colmena',       plan: 'Las Condes Premium',            precio_uf: 1.65, dot: '#1D9E75' },
       { isapre: 'Banmédica',     plan: 'Lite Ultra Clínica Las Condes', precio_uf: 1.70, dot: '#0C447C' },
-      { isapre: 'Banmédica',     plan: 'Signo VidaIntegra LC',        precio_uf: 2.10, dot: '#0C447C' },
+      { isapre: 'Banmédica',     plan: 'Signo VidaIntegra LC',          precio_uf: 2.10, dot: '#0C447C' },
     ],
     'davila': [
       { isapre: 'Nueva Masvida', plan: 'Premier Dávila',          precio_uf: 1.05, dot: '#F59E0B' },
@@ -60,12 +78,11 @@
     ],
   };
 
-  // ── Cálculo real basado en UF, TFU y cotización legal ──
-  function calcularDiagnostico(renta, cargas, situacion, clinica) {
-    const rentaEf  = Math.min(renta, TOPE_RENTA);
+  function calcularDiagnostico(renta, cargas, situacion, clinica, pago_actual) {
+    const rentaEf    = Math.min(renta, TOPE_RENTA);
     const cotizacion = Math.round(rentaEf * 0.07);
-    const fCargas  = factorCargas(cargas);
-    const fTotal   = parseFloat((1.0 + fCargas).toFixed(2)); // titular tramo 25-49 (1.0) + cargas
+    const fCargas    = factorCargas(cargas);
+    const fTotal     = parseFloat((1.0 + fCargas).toFixed(2));
 
     const planesBase = PLANES_DB[clinica] || PLANES_DB['sin-preferencia'];
     const planes = planesBase.map(p => ({
@@ -74,64 +91,89 @@
       clpTotal: Math.round(p.precio_uf * fTotal * UF / 1000) * 1000,
     }));
 
-    const planMin = planes[0]; // ya vienen ordenados de menor a mayor precio
+    const planMin   = planes[0];
+    const planMed   = planes[Math.min(1, planes.length - 1)];
     const excedente = cotizacion - planMin.clpTotal;
 
     let ahorroMin = 0, ahorroMax = 0;
 
-    if (situacion === 'fonasa') {
-      // El 7% que hoy va a Fonasa puede cubrir el plan y generar excedente en cuenta de salud
+    if (pago_actual && (situacion === 'isapre-cara' || situacion === 'isapre-subio')) {
+      // Ahorro exacto basado en pago declarado
+      ahorroMin = Math.max(0, pago_actual - planMed.clpTotal);
+      ahorroMax = Math.max(0, pago_actual - planMin.clpTotal);
+    } else if (situacion === 'fonasa') {
       ahorroMin = Math.max(0, Math.round(excedente * 0.5 / 1000) * 1000);
       ahorroMax = Math.max(0, excedente);
     } else if (situacion === 'isapre-cara' || situacion === 'isapre-subio') {
-      // Estimamos que están pagando un plan ~2x el mínimo disponible
       const estimadoActual = Math.round(planMin.clpTotal * 2.2 / 1000) * 1000;
-      const planMed = planes[Math.min(1, planes.length - 1)];
       ahorroMin = Math.max(0, estimadoActual - planMed.clpTotal);
       ahorroMax = Math.max(0, estimadoActual - planMin.clpTotal);
     } else {
-      // Comparar: mostrar rango desde plan mín a cotización
       ahorroMin = Math.max(0, Math.round(excedente * 0.3 / 1000) * 1000);
       ahorroMax = Math.max(0, Math.round(excedente * 0.7 / 1000) * 1000);
     }
 
-    return { cotizacion, planMin, excedente, planes, ahorroMin, ahorroMax, fTotal };
+    return { cotizacion, planMin, planMed, excedente, planes, ahorroMin, ahorroMax, fTotal };
   }
 
   function formatCLP(n) {
     return '$' + n.toLocaleString('es-CL');
   }
 
-  // ── Renderizado de pasos ──
+  // ── Opciones previsión actual ──
+  const PREVISION_OPCIONES = [
+    { val: 'banmedica',    label: 'Banmédica' },
+    { val: 'colmena',      label: 'Colmena' },
+    { val: 'consalud',     label: 'Consalud' },
+    { val: 'cruzblanca',   label: 'Cruz Blanca' },
+    { val: 'masvida',      label: 'MasVida' },
+    { val: 'vidatres',     label: 'Vida Tres' },
+    { val: 'nueva_masvida', label: 'Nueva MásVida' },
+    { val: 'esencial',     label: 'Esencial' },
+  ];
+
+  // ── Renderizado principal ──
   function renderPaso() {
     const card = document.getElementById('calc-card');
     if (!card) return;
 
     updateProgress();
 
-    switch (state.paso) {
-      case 1: renderPaso1(card); break;
-      case 2: renderPaso2(card); break;
-      case 3: renderPaso3(card); break;
-      case 4: renderPaso4(card); break;
-      case 5: renderResultado(card); break;
+    const steps    = getSteps();
+    const stepName = steps[state.currentStep] || 'resultado';
+
+    switch (stepName) {
+      case 'situacion':     renderSituacion(card);    break;
+      case 'isapre_actual': renderIsapreActual(card); break;
+      case 'renta':         renderRenta(card);        break;
+      case 'cargas':        renderCargas(card);       break;
+      case 'preferencia':   renderPreferencia(card);  break;
+      case 'clinica':       renderClinica(card);      break;
+      default:              renderResultado(card);    break;
     }
   }
 
   function updateProgress() {
-    const fill = document.getElementById('progress-fill');
+    const fill      = document.getElementById('progress-fill');
     const stepLabel = document.getElementById('step-label');
     if (!fill || !stepLabel) return;
-    const porcentaje = Math.min((state.paso / 4) * 100, 100);
-    fill.style.width = porcentaje + '%';
-    if (state.paso <= 4) {
-      stepLabel.textContent = `Paso ${state.paso} de 4`;
+
+    const steps = getSteps();
+    const total = steps.length;
+    const idx   = state.currentStep;
+
+    if (idx < total) {
+      const porcentaje = Math.round(((idx + 1) / (total + 1)) * 100);
+      fill.style.width = porcentaje + '%';
+      stepLabel.textContent = `Paso ${idx + 1} de ${total}`;
     } else {
+      fill.style.width = '100%';
       stepLabel.textContent = '¡Diagnóstico listo!';
     }
   }
 
-  function renderPaso1(card) {
+  // ── Paso 1: Situación ──
+  function renderSituacion(card) {
     document.getElementById('calc-body').innerHTML = `
       <p class="calc-question">¿Cuál es tu situación actual?</p>
       <div class="calc-options">
@@ -149,7 +191,7 @@
         </button>
       </div>
       <div class="calc-nav">
-        <button class="btn-next" id="btn-next-1" ${!state.situacion ? 'disabled' : ''}>
+        <button class="btn-next" id="btn-next-sit" ${!state.situacion ? 'disabled' : ''}>
           Siguiente →
         </button>
       </div>
@@ -160,18 +202,66 @@
         card.querySelectorAll('.calc-option').forEach(b => b.classList.remove('selected'));
         this.classList.add('selected');
         state.situacion = this.dataset.val;
-        document.getElementById('btn-next-1').disabled = false;
+        document.getElementById('btn-next-sit').disabled = false;
       });
     });
 
-    document.getElementById('btn-next-1').addEventListener('click', function () {
+    document.getElementById('btn-next-sit').addEventListener('click', function () {
       if (!state.situacion) return;
-      state.paso = 2;
+      state.currentStep = 1;
       renderPaso();
     });
   }
 
-  function renderPaso2(card) {
+  // ── Paso 1.5: Isapre actual (solo para usuarios de isapre) ──
+  function renderIsapreActual(card) {
+    const optionsHTML = PREVISION_OPCIONES.map(op => `
+      <button class="calc-option${state.prevision_actual === op.val ? ' selected' : ''}" data-val="${op.val}">
+        ${op.label}
+      </button>
+    `).join('');
+
+    document.getElementById('calc-body').innerHTML = `
+      <p class="calc-question">¿Cuál es tu isapre actual?</p>
+      <div class="calc-options calc-options--grid">${optionsHTML}</div>
+      <div class="form-group" style="margin-top:16px;">
+        <label for="pago-actual" style="font-size:14px;font-weight:600;color:#334155;">
+          ¿Cuánto pagas actualmente? (opcional)
+        </label>
+        <input type="number" id="pago-actual" class="form-input"
+               placeholder="Ej: 180000" inputmode="numeric" min="0" max="5000000"
+               value="${state.pago_actual || ''}"
+               style="margin-top:6px;">
+        <small style="color:#64748b;font-size:12px;">CLP mensual incluyendo cargas</small>
+      </div>
+      <div class="calc-nav">
+        <button class="btn-back" id="btn-back-isapre">← Volver</button>
+        <button class="btn-next" id="btn-next-isapre" ${!state.prevision_actual ? 'disabled' : ''}>
+          Siguiente →
+        </button>
+      </div>
+    `;
+
+    card.querySelectorAll('.calc-option').forEach(btn => {
+      btn.addEventListener('click', function () {
+        card.querySelectorAll('.calc-option').forEach(b => b.classList.remove('selected'));
+        this.classList.add('selected');
+        state.prevision_actual = this.dataset.val;
+        document.getElementById('btn-next-isapre').disabled = false;
+      });
+    });
+
+    document.getElementById('btn-back-isapre').addEventListener('click', goBack);
+    document.getElementById('btn-next-isapre').addEventListener('click', function () {
+      if (!state.prevision_actual) return;
+      const pagoInput = parseInt(document.getElementById('pago-actual').value);
+      state.pago_actual = (pagoInput > 0) ? pagoInput : null;
+      goNext();
+    });
+  }
+
+  // ── Paso renta ──
+  function renderRenta(card) {
     const cotizacion = Math.round(state.renta * 0.07);
     document.getElementById('calc-body').innerHTML = `
       <p class="calc-question">¿Cuál es tu renta imponible aproximada?</p>
@@ -184,28 +274,24 @@
         </div>
       </div>
       <div class="calc-nav">
-        <button class="btn-back" id="btn-back-2">← Volver</button>
-        <button class="btn-next" id="btn-next-2">Siguiente →</button>
+        <button class="btn-back" id="btn-back-renta">← Volver</button>
+        <button class="btn-next" id="btn-next-renta">Siguiente →</button>
       </div>
     `;
 
-    const slider = document.getElementById('renta-slider');
-    slider.addEventListener('input', function () {
+    document.getElementById('renta-slider').addEventListener('input', function () {
       state.renta = parseInt(this.value);
       const cot = Math.round(state.renta * 0.07);
       document.getElementById('renta-monto').textContent = formatCLP(state.renta);
       document.getElementById('renta-pct').textContent = formatCLP(cot) + '/mes';
     });
 
-    document.getElementById('btn-back-2').addEventListener('click', function () {
-      state.paso = 1; renderPaso();
-    });
-    document.getElementById('btn-next-2').addEventListener('click', function () {
-      state.paso = 3; renderPaso();
-    });
+    document.getElementById('btn-back-renta').addEventListener('click', goBack);
+    document.getElementById('btn-next-renta').addEventListener('click', goNext);
   }
 
-  function renderPaso3(card) {
+  // ── Paso cargas ──
+  function renderCargas(card) {
     document.getElementById('calc-body').innerHTML = `
       <p class="calc-question">¿Tienes cargas familiares?</p>
       <div class="calc-options">
@@ -223,8 +309,8 @@
         </button>
       </div>
       <div class="calc-nav">
-        <button class="btn-back" id="btn-back-3">← Volver</button>
-        <button class="btn-next" id="btn-next-3" ${!state.cargas ? 'disabled' : ''}>Siguiente →</button>
+        <button class="btn-back" id="btn-back-cargas">← Volver</button>
+        <button class="btn-next" id="btn-next-cargas" ${!state.cargas ? 'disabled' : ''}>Siguiente →</button>
       </div>
     `;
 
@@ -233,20 +319,56 @@
         card.querySelectorAll('.calc-option').forEach(b => b.classList.remove('selected'));
         this.classList.add('selected');
         state.cargas = this.dataset.val;
-        document.getElementById('btn-next-3').disabled = false;
+        document.getElementById('btn-next-cargas').disabled = false;
       });
     });
 
-    document.getElementById('btn-back-3').addEventListener('click', function () {
-      state.paso = 2; renderPaso();
-    });
-    document.getElementById('btn-next-3').addEventListener('click', function () {
+    document.getElementById('btn-back-cargas').addEventListener('click', goBack);
+    document.getElementById('btn-next-cargas').addEventListener('click', function () {
       if (!state.cargas) return;
-      state.paso = 4; renderPaso();
+      goNext();
     });
   }
 
-  function renderPaso4(card) {
+  // ── Paso preferencia ──
+  function renderPreferencia(card) {
+    document.getElementById('calc-body').innerHTML = `
+      <p class="calc-question">¿Qué es más importante para ti?</p>
+      <div class="calc-options">
+        <button class="calc-option${state.preferencia === 'economica' ? ' selected' : ''}" data-val="economica">
+          <span class="calc-option__emoji">💰</span>Pagar lo menos posible
+        </button>
+        <button class="calc-option${state.preferencia === 'cobertura' ? ' selected' : ''}" data-val="cobertura">
+          <span class="calc-option__emoji">🛡️</span>Mayor cobertura y reembolsos
+        </button>
+        <button class="calc-option${state.preferencia === 'equilibrio' ? ' selected' : ''}" data-val="equilibrio">
+          <span class="calc-option__emoji">⚖️</span>Equilibrio precio/cobertura
+        </button>
+      </div>
+      <div class="calc-nav">
+        <button class="btn-back" id="btn-back-pref">← Volver</button>
+        <button class="btn-next" id="btn-next-pref" ${!state.preferencia ? 'disabled' : ''}>Siguiente →</button>
+      </div>
+    `;
+
+    card.querySelectorAll('.calc-option').forEach(btn => {
+      btn.addEventListener('click', function () {
+        card.querySelectorAll('.calc-option').forEach(b => b.classList.remove('selected'));
+        this.classList.add('selected');
+        state.preferencia = this.dataset.val;
+        document.getElementById('btn-next-pref').disabled = false;
+      });
+    });
+
+    document.getElementById('btn-back-pref').addEventListener('click', goBack);
+    document.getElementById('btn-next-pref').addEventListener('click', function () {
+      if (!state.preferencia) return;
+      goNext();
+    });
+  }
+
+  // ── Paso clínica ──
+  function renderClinica(card) {
     document.getElementById('calc-body').innerHTML = `
       <p class="calc-question">¿Tienes clínica preferente?</p>
       <div class="calc-options">
@@ -264,8 +386,8 @@
         </button>
       </div>
       <div class="calc-nav">
-        <button class="btn-back" id="btn-back-4">← Volver</button>
-        <button class="btn-next" id="btn-next-4" ${!state.clinica ? 'disabled' : ''}>Ver mi diagnóstico →</button>
+        <button class="btn-back" id="btn-back-cli">← Volver</button>
+        <button class="btn-next" id="btn-next-cli" ${!state.clinica ? 'disabled' : ''}>Ver mi diagnóstico →</button>
       </div>
     `;
 
@@ -274,29 +396,39 @@
         card.querySelectorAll('.calc-option').forEach(b => b.classList.remove('selected'));
         this.classList.add('selected');
         state.clinica = this.dataset.val;
-        document.getElementById('btn-next-4').disabled = false;
+        document.getElementById('btn-next-cli').disabled = false;
       });
     });
 
-    document.getElementById('btn-back-4').addEventListener('click', function () {
-      state.paso = 3; renderPaso();
-    });
-    document.getElementById('btn-next-4').addEventListener('click', function () {
+    document.getElementById('btn-back-cli').addEventListener('click', goBack);
+    document.getElementById('btn-next-cli').addEventListener('click', function () {
       if (!state.clinica) return;
-      const diag = calcularDiagnostico(state.renta, state.cargas, state.situacion, state.clinica);
-      state.ahorro_min = diag.ahorroMin;
-      state.ahorro_max = diag.ahorroMax;
-      state.diagnostico = diag;
-      state.isapres = diag.planes.slice(0, 3).map(p => p.isapre);
 
-      // Guardar en sesión Django
+      const diag = calcularDiagnostico(
+        state.renta, state.cargas, state.situacion, state.clinica, state.pago_actual
+      );
+      state.ahorro_min  = diag.ahorroMin;
+      state.ahorro_max  = diag.ahorroMax;
+      state.diagnostico = diag;
+      state.isapres     = diag.planes.slice(0, 3).map(p => p.isapre);
+
       fetch('/leads/diagnostico/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken') },
-        body: JSON.stringify(state),
+        body: JSON.stringify({
+          situacion:        state.situacion,
+          prevision_actual: state.prevision_actual,
+          pago_actual:      state.pago_actual,
+          renta:            state.renta,
+          cargas:           state.cargas,
+          clinica:          state.clinica,
+          preferencia:      state.preferencia,
+          ahorro_min:       diag.ahorroMin,
+          ahorro_max:       diag.ahorroMax,
+          isapres:          state.isapres,
+        }),
       }).catch(() => {});
 
-      // Analytics
       if (window.dataLayer) {
         window.dataLayer.push({
           event: 'diagnostico_completado',
@@ -306,38 +438,37 @@
         });
       }
 
-      state.paso = 5;
+      state.currentStep = getSteps().length; // más allá del último paso → resultado
       renderPaso();
     });
   }
 
+  // ── Resultado + formulario ──
   function renderResultado(card) {
-    const diag = state.diagnostico;
+    const diag     = state.diagnostico;
     const isAlerta = state.situacion === 'isapre-subio' || state.situacion === 'isapre-cara';
 
-    // ── Título y cifra principal ──
     let titulo, valorPrincipal, subPrincipal;
     if (state.situacion === 'fonasa') {
       if (diag.ahorroMax > 0) {
-        titulo = 'Excedente mensual estimado en tu cuenta de salud';
+        titulo        = 'Excedente mensual estimado en tu cuenta de salud';
         valorPrincipal = `${formatCLP(diag.ahorroMin)} – ${formatCLP(diag.ahorroMax)}`;
-        subPrincipal = 'Tu 7% ya cubre el plan y te queda saldo para copagos';
+        subPrincipal  = 'Tu 7% ya cubre el plan y te queda saldo para copagos';
       } else {
-        titulo = 'Cobertura privada real desde';
+        titulo        = 'Cobertura privada real desde';
         valorPrincipal = `${formatCLP(diag.planMin.clpTotal)}/mes`;
-        subPrincipal = `${diag.planMin.isapre} · ${diag.planMin.plan} · ${diag.planMin.ufTotal} UF`;
+        subPrincipal  = `${diag.planMin.isapre} · ${diag.planMin.plan} · ${diag.planMin.ufTotal} UF`;
       }
     } else if (isAlerta) {
-      titulo = 'Ahorro potencial al cambiarte de plan';
+      titulo        = state.pago_actual ? 'Tu ahorro potencial al cambiarte' : 'Ahorro potencial al cambiarte de plan';
       valorPrincipal = `${formatCLP(diag.ahorroMin)} – ${formatCLP(diag.ahorroMax)}`;
-      subPrincipal = 'mensuales con un plan más eficiente para tu perfil';
+      subPrincipal  = 'mensuales con un plan más eficiente para tu perfil';
     } else {
-      titulo = 'Planes disponibles para tu perfil desde';
+      titulo        = 'Planes disponibles para tu perfil desde';
       valorPrincipal = `${formatCLP(diag.planMin.clpTotal)}/mes`;
-      subPrincipal = `${diag.planMin.isapre} · ${diag.planMin.plan} · ${diag.planMin.ufTotal} UF`;
+      subPrincipal  = `${diag.planMin.isapre} · ${diag.planMin.plan} · ${diag.planMin.ufTotal} UF`;
     }
 
-    // ── Desglose financiero real ──
     const exHTML = diag.excedente > 0
       ? `<div class="result-bd-row result-bd-row--pos">
           <span>Excedente en tu cuenta de salud</span>
@@ -348,7 +479,13 @@
           <strong>${formatCLP(-diag.excedente)}/mes</strong>
          </div>`;
 
-    // ── Lista de planes con precios reales ──
+    const pagoActualHTML = (state.pago_actual && isAlerta)
+      ? `<div class="result-bd-row">
+          <span>Tu pago actual (declarado)</span>
+          <strong>${formatCLP(state.pago_actual)}/mes</strong>
+         </div>`
+      : '';
+
     const planesHTML = diag.planes.slice(0, 3).map((p, i) => `
       <div class="isapre-item${i === 0 ? ' isapre-item--best' : ''}">
         <div class="isapre-item__dot" style="background:${p.dot}"></div>
@@ -382,6 +519,7 @@
           <span>Tu cotización legal (7% de ${formatCLP(state.renta)})</span>
           <strong>${formatCLP(diag.cotizacion)}/mes</strong>
         </div>
+        ${pagoActualHTML}
         <div class="result-bd-row result-bd-row--plan">
           <span>Plan más económico para tu perfil<br>
             <small>${diag.planMin.isapre} · ${diag.planMin.plan} · ${diag.planMin.ufTotal} UF × factor ${diag.fTotal.toFixed(2)}</small>
@@ -417,7 +555,7 @@
             <div class="form-error" id="error-rut"></div>
           </div>
           <div class="form-group">
-            <label for="telefono">Celular</label>
+            <label for="telefono">Celular (WhatsApp)</label>
             <input type="tel" id="telefono" name="telefono" class="form-input"
                    placeholder="9 1234 5678" autocomplete="tel" inputmode="tel" required>
             <div class="form-error" id="error-telefono"></div>
@@ -425,8 +563,14 @@
           <div class="form-group">
             <label for="email">Correo electrónico</label>
             <input type="email" id="email" name="email" class="form-input"
-                   placeholder="correo@ejemplo.cl" autocomplete="email" required>
+                   placeholder="correo@ejemplo.cl" autocomplete="email">
             <div class="form-error" id="error-email"></div>
+          </div>
+          <div class="form-group">
+            <label for="edad-input">Tu edad (años)</label>
+            <input type="number" id="edad-input" name="edad-input" class="form-input"
+                   placeholder="Ej: 35" min="18" max="100" inputmode="numeric">
+            <div class="form-error" id="error-edad"></div>
           </div>
           <button type="submit" class="cta-primary" id="btn-submit">
             ✓ Quiero mi cotización exacta gratis
@@ -446,18 +590,17 @@
 
   async function submitLead(e) {
     e.preventDefault();
-    const form = e.target;
-    const btn = document.getElementById('btn-submit');
+    const form      = e.target;
+    const btn       = document.getElementById('btn-submit');
     const errGlobal = document.getElementById('form-error-global');
     errGlobal.style.display = 'none';
 
-    // Validación client-side antes de enviar
     let tieneErrores = false;
     const campos = [
-      { id: 'nombre', errId: 'error-nombre', check: v => v.length >= 2, msg: 'Ingresa tu nombre completo.' },
-      { id: 'rut',    errId: 'error-rut',    check: v => validarRut(v),  msg: 'RUT inválido. Ej: 12.345.678-9' },
+      { id: 'nombre',   errId: 'error-nombre',   check: v => v.length >= 2,    msg: 'Ingresa tu nombre completo.' },
+      { id: 'rut',      errId: 'error-rut',      check: v => validarRut(v),     msg: 'RUT inválido. Ej: 12.345.678-9' },
       { id: 'telefono', errId: 'error-telefono', check: v => validarCelular(v), msg: 'Celular inválido. Ej: 9 1234 5678' },
-      { id: 'email',  errId: 'error-email',  check: v => validarEmail(v), msg: 'Correo electrónico inválido.' },
+      { id: 'email',    errId: 'error-email',    check: v => validarEmail(v),   msg: 'Correo electrónico inválido.' },
     ];
     campos.forEach(({ id, errId, check, msg }) => {
       const input = document.getElementById(id);
@@ -482,18 +625,17 @@
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner"></span> Enviando...';
 
-    const data = new FormData(form);
+    const data   = new FormData(form);
     const params = new URLSearchParams();
     data.forEach((v, k) => params.append(k, v));
 
-    // UTMs
     const urlParams = new URLSearchParams(window.location.search);
     ['utm_source', 'utm_medium', 'utm_campaign'].forEach(k => {
       if (urlParams.get(k)) params.append(k, urlParams.get(k));
     });
 
     try {
-      const res = await fetch('/leads/nuevo/', {
+      const res  = await fetch('/leads/nuevo/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -508,7 +650,7 @@
         window.location.href = json.redirect || '/gracias/';
       } else if (json.errors) {
         Object.entries(json.errors).forEach(([field, errors]) => {
-          const el = document.getElementById('error-' + field);
+          const el    = document.getElementById('error-' + field);
           if (el) el.textContent = errors[0];
           const input = document.getElementById(field);
           if (input) input.classList.add('error');
@@ -530,7 +672,7 @@
   }
 
   function getCookie(name) {
-    const v = `; ${document.cookie}`;
+    const v     = `; ${document.cookie}`;
     const parts = v.split(`; ${name}=`);
     if (parts.length === 2) return parts.pop().split(';').shift();
     return '';
@@ -541,7 +683,7 @@
     let suma = 0, mult = 2;
     for (let i = cuerpo.length - 1; i >= 0; i--) {
       suma += parseInt(cuerpo[i]) * mult;
-      mult = mult < 7 ? mult + 1 : 2;
+      mult  = mult < 7 ? mult + 1 : 2;
     }
     const res = 11 - (suma % 11);
     if (res === 11) return '0';
@@ -553,15 +695,15 @@
     const limpio = rut.toUpperCase().replace(/\./g, '').replace(/-/g, '').replace(/\s/g, '');
     if (!/^\d{7,8}[0-9K]$/.test(limpio)) return false;
     const cuerpo = limpio.slice(0, -1);
-    const dv = limpio.slice(-1);
+    const dv     = limpio.slice(-1);
     return dv === rutDigitoVerificador(cuerpo);
   }
 
   function formatearRut(val) {
     let limpio = val.toUpperCase().replace(/[^0-9K]/g, '');
     if (limpio.length === 0) return '';
-    const dv = limpio.slice(-1);
-    const cuerpo = limpio.slice(0, -1);
+    const dv      = limpio.slice(-1);
+    const cuerpo  = limpio.slice(0, -1);
     if (cuerpo.length === 0) return dv;
     const cuerpoFmt = cuerpo.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
     return `${cuerpoFmt}-${dv}`;
@@ -571,9 +713,9 @@
     const input = document.getElementById(inputId);
     if (!input) return;
     input.addEventListener('input', function () {
-      const pos = this.selectionStart;
+      const pos    = this.selectionStart;
       const rawLen = this.value.length;
-      this.value = formatearRut(this.value);
+      this.value   = formatearRut(this.value);
       const newLen = this.value.length;
       this.setSelectionRange(pos + (newLen - rawLen), pos + (newLen - rawLen));
     });
@@ -591,7 +733,7 @@
   }
 
   function validarEmail(email) {
-    if (!email) return true; // opcional
+    if (!email) return true;
     return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
   }
 
@@ -604,7 +746,7 @@
   function initFAQ() {
     document.querySelectorAll('.faq-question').forEach(btn => {
       btn.addEventListener('click', function () {
-        const item = this.closest('.faq-item');
+        const item   = this.closest('.faq-item');
         const isOpen = item.classList.contains('open');
         document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
         if (!isOpen) item.classList.add('open');
@@ -631,7 +773,6 @@
       e.preventDefault();
       const btn = formFinal.querySelector('[type=submit]');
 
-      // Validación client-side
       let tieneErrores = false;
       const camposFinal = [
         { id: 'nombre-final',   errId: 'error-nombre-final',   check: v => v.length >= 2,    msg: 'Ingresa tu nombre completo.' },
@@ -662,14 +803,14 @@
       btn.disabled = true;
       btn.innerHTML = '<span class="spinner"></span> Enviando...';
 
-      const params = new URLSearchParams(new FormData(formFinal));
+      const params    = new URLSearchParams(new FormData(formFinal));
       const urlParams = new URLSearchParams(window.location.search);
       ['utm_source', 'utm_medium', 'utm_campaign'].forEach(k => {
         if (urlParams.get(k)) params.append(k, urlParams.get(k));
       });
 
       try {
-        const res = await fetch('/leads/nuevo/', {
+        const res  = await fetch('/leads/nuevo/', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -683,7 +824,7 @@
           window.location.href = json.redirect || '/gracias/';
         } else if (json.errors) {
           Object.entries(json.errors).forEach(([field, errors]) => {
-            const el = document.getElementById('error-' + field + '-final');
+            const el  = document.getElementById('error-' + field + '-final');
             if (el) el.textContent = errors[0];
             const inp = document.getElementById(field + '-final');
             if (inp) inp.classList.add('error');
@@ -703,7 +844,7 @@
 
   // ── Hamburger nav ──
   function initHamburger() {
-    const btn = document.getElementById('hamburger-btn');
+    const btn  = document.getElementById('hamburger-btn');
     const menu = document.getElementById('mobile-menu');
     if (!btn || !menu) return;
 
@@ -713,7 +854,6 @@
       btn.setAttribute('aria-expanded', isOpen);
     });
 
-    // Cerrar al hacer clic en enlace
     menu.querySelectorAll('a').forEach(a => {
       a.addEventListener('click', () => {
         menu.classList.remove('open');
@@ -747,16 +887,15 @@
 
   // ── Contadores animados ──
   function animateCounter(el) {
-    const target = parseInt(el.dataset.target, 10);
-    const prefix = el.dataset.prefix || '';
+    const target   = parseInt(el.dataset.target, 10);
+    const prefix   = el.dataset.prefix || '';
     const duration = 1500;
-    const start = performance.now();
-    const startVal = 0;
+    const start    = performance.now();
 
     function step(now) {
       const progress = Math.min((now - start) / duration, 1);
-      const ease = 1 - Math.pow(1 - progress, 3);
-      const current = Math.round(startVal + (target - startVal) * ease);
+      const ease     = 1 - Math.pow(1 - progress, 3);
+      const current  = Math.round(target * ease);
       el.textContent = prefix + current.toLocaleString('es-CL');
       if (progress < 1) requestAnimationFrame(step);
     }
@@ -782,22 +921,20 @@
     const input = document.getElementById('sueldo-input');
     if (!input) return;
 
-    const edadSelect = document.getElementById('edad-tramo');
+    const edadSelect  = document.getElementById('edad-tramo');
     const badgeFactor = document.getElementById('badge-factor');
 
     function fmt(n) { return '$' + Math.round(n).toLocaleString('es-CL'); }
     function fmtFactor(f) { return '×' + f.toFixed(2).replace('.', ','); }
 
     function update() {
-      const sueldo     = parseInt(input.value, 10) || 700000;
-      const factor     = edadSelect ? parseFloat(edadSelect.value) : 1.0;
+      const sueldo    = parseInt(input.value, 10) || 700000;
+      const factor    = edadSelect ? parseFloat(edadSelect.value) : 1.0;
       const rentaEf   = Math.min(sueldo, TOPE_RENTA);
-      const cot        = Math.round(rentaEf * 0.07);
-
-      // Plan mínimo real: Nueva Masvida Plan Libre 0.80 UF × factor etario
-      const planMinUF  = 0.80;
-      const planCost   = Math.round(planMinUF * factor * UF);
-      const excedente  = cot - planCost;
+      const cot       = Math.round(rentaEf * 0.07);
+      const planMinUF = 0.80;
+      const planCost  = Math.round(planMinUF * factor * UF);
+      const excedente = cot - planCost;
 
       const resSueldo  = document.getElementById('res-sueldo');
       const res7pct    = document.getElementById('res-7pct');
