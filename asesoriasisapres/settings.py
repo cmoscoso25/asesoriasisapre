@@ -135,6 +135,16 @@ CSP_FRAME_ANCESTORS = ("'none'",)
 CSP_BASE_URI        = ("'self'",)
 CSP_FORM_ACTION     = ("'self'",)
 
+# Proxy SSL (Cloudflare → Render): Django lee X-Forwarded-Proto para saber que es HTTPS
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# Dominos confiados para CSRF (requerido en Django 4.0+ detrás de proxy)
+CSRF_TRUSTED_ORIGINS = [
+    'https://asesoriasisapres.com',
+    'https://www.asesoriasisapres.com',
+    'https://asesoriasisapre.onrender.com',
+]
+
 # Seguridad en producción
 if not DEBUG:
     SECURE_SSL_REDIRECT = True
@@ -145,8 +155,10 @@ if not DEBUG:
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = 'Lax'
     CSRF_COOKIE_SECURE = True
-    CSRF_COOKIE_HTTPONLY = True
-    CSRF_COOKIE_SAMESITE = 'Strict'
+    # CSRF_COOKIE_HTTPONLY debe ser False (default) para que JS pueda leer
+    # el token vía document.cookie y enviarlo en X-CSRFToken (AJAX)
+    CSRF_COOKIE_HTTPONLY = False
+    CSRF_COOKIE_SAMESITE = 'Lax'
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
     X_FRAME_OPTIONS = 'DENY'
