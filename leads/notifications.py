@@ -46,7 +46,7 @@ def notificar_asesor(lead):
 
     filas_html = (
         _fila("Nombre", lead.nombre, bold=True) +
-        _fila("N° RUT", f'<strong>{lead.rut}</strong> <span style="color:#1D9E75;font-size:12px;">&#10003; Verificado</span>') +
+        _fila("RUT", f'<strong>{lead.rut}</strong> <span style="color:#1D9E75;font-size:12px;">&#10003; Verificado</span>') +
         _fila("Celular / WhatsApp",
               f'<a href="{wa_link}" style="color:#0C447C;">'
               f'+569 {lead.telefono}</a>'
