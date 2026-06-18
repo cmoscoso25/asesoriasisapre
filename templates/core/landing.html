@@ -1,0 +1,1182 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block body %}
+
+<!-- ══════════════════════════════════════════
+     BARRA ANUNCIO URGENCIA
+══════════════════════════════════════════ -->
+<div class="announce-bar" id="announce-bar" role="alert">
+  ⚠️ <strong>2026:</strong> Si tu isapre subió el precio, tienes derecho a cambiarte AHORA sin penalización.
+  <a href="#inicio">Haz tu diagnóstico gratis →</a>
+  <button class="announce-bar__close" onclick="document.getElementById('announce-bar').style.display='none'" aria-label="Cerrar anuncio">✕</button>
+</div>
+
+<!-- ══════════════════════════════════════════
+     NAV
+══════════════════════════════════════════ -->
+<nav class="nav" id="main-nav" role="navigation" aria-label="Navegación principal">
+  <div class="container">
+    <div class="nav__inner">
+      <a href="/" class="nav__logo" aria-label="AsesoríasIsapres.com — inicio">
+        <img src="{% static 'img/logo-oscuro.svg' %}" alt="AsesoríasIsapres.com" width="185" height="42" fetchpriority="high">
+      </a>
+
+      <!-- Links desktop -->
+      <nav class="nav__links-desktop" aria-label="Menú principal">
+        <a href="#como-funciona">Cómo funciona</a>
+        <a href="#comparativa">Comparar isapres</a>
+        <a href="#calculadora">Calculadora</a>
+        <a href="#preguntas">Preguntas frecuentes</a>
+      </nav>
+
+      <a href="tel:+56964345927" class="nav__cta">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+        </svg>
+        +56 9 6434 5927
+      </a>
+
+      <!-- Hamburger mobile -->
+      <button class="nav__hamburger" id="hamburger-btn" aria-label="Abrir menú" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Menú mobile -->
+  <div class="nav__mobile-menu" id="mobile-menu" role="menu">
+    <a href="#inicio" role="menuitem">🏠 Inicio</a>
+    <a href="#como-funciona" role="menuitem">📋 Cómo funciona</a>
+    <a href="#comparativa" role="menuitem">📊 Comparar isapres</a>
+    <a href="#calculadora" role="menuitem">🧮 Calcular mi ahorro</a>
+    <a href="#testimonios" role="menuitem">⭐ Testimonios</a>
+    <a href="#preguntas" role="menuitem">❓ Preguntas frecuentes</a>
+    <a href="https://wa.me/{{ whatsapp_number }}" class="nav__mobile-cta" target="_blank" rel="noopener noreferrer">
+      💬 Contactar por WhatsApp
+    </a>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════════
+     HERO
+══════════════════════════════════════════ -->
+<section class="hero" id="inicio">
+  <div class="container">
+    <div class="hero__grid">
+
+      <!-- Copy -->
+      <div class="hero__copy">
+        <div class="hero__badge">Asesoría 100% gratuita · Sin compromiso</div>
+        <h1 class="hero__headline">
+          El mejor plan de isapre en Chile para <em>tu bolsillo</em>
+        </h1>
+        <p class="hero__sub">
+          Diagnóstico personalizado en 60 segundos. Comparamos todas las isapres
+          según tu sueldo, familia y clínica preferente. Sin letra chica.
+        </p>
+
+        <div class="hero__alerta">
+          <p>
+            <strong>⚠️ Alerta 2026:</strong> Si tu isapre subió el precio de tu plan,
+            tienes derecho legal a cambiarte <strong>ahora</strong>, sin esperar tu
+            mes de aniversario. Tope ICSA: 3,5%.
+          </p>
+        </div>
+
+        <div class="hero__proof">
+          <div class="proof-item">
+            <div class="proof-item__num"><span class="counter" data-target="2400" data-prefix="+">+2.400</span></div>
+            <div class="proof-item__label">familias<br>asesoradas</div>
+          </div>
+          <div class="proof-item">
+            <div class="proof-item__num">⭐ 4,9</div>
+            <div class="proof-item__label">calificación<br>Google</div>
+          </div>
+          <div class="proof-item">
+            <div class="proof-item__num">$42.000</div>
+            <div class="proof-item__label">ahorro<br>promedio/mes</div>
+          </div>
+        </div>
+
+        <div class="social-proof-bar" aria-live="polite" aria-atomic="true">
+          <span class="social-proof-bar__dot"></span>
+          <span><strong>3 personas</strong> están haciendo su diagnóstico ahora mismo</span>
+        </div>
+
+        <div class="trust-badges">
+          <span class="trust-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Acreditado Supersalud
+          </span>
+          <span class="trust-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+            Datos 100% seguros
+          </span>
+          <span class="trust-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            Sin compromiso
+          </span>
+        </div>
+
+        <div class="hero__tel-line">
+          <a href="tel:+56964345927" class="hero__tel-link">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20" aria-hidden="true">
+              <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+            </svg>
+            +56 9 6434 5927
+          </a>
+          <span class="hero__tel-hours">Lun – Vie · 9:00 – 18:00</span>
+        </div>
+
+        <div style="margin-top:var(--space-4);display:flex;flex-wrap:wrap;gap:var(--space-2);">
+          <span class="hero__keyword-chip">cotizar isapre</span>
+          <span class="hero__keyword-chip">cambio de isapre 2026</span>
+          <span class="hero__keyword-chip">ahorro en salud</span>
+        </div>
+      </div>
+
+      <!-- Calculadora -->
+      <div class="hero__calc">
+        <div class="calc-card" id="calc-card">
+          <div class="calc-header">
+            <div class="calc-icon" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+              </svg>
+            </div>
+            <div>
+              <div class="calc-title">Diagnóstico isapre gratis</div>
+              <div class="calc-subtitle">4 preguntas · 60 segundos</div>
+            </div>
+          </div>
+
+          <div class="calc-progress-wrap">
+            <div class="calc-step-label">
+              <span>Tu situación</span>
+              <span id="step-label">Paso 1 de 4</span>
+            </div>
+            <div class="calc-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100">
+              <div class="calc-progress__fill" id="progress-fill"></div>
+            </div>
+          </div>
+
+          <div id="calc-body">
+            <!-- JS renderiza aquí -->
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     LOGOS ISAPRES
+══════════════════════════════════════════ -->
+<section class="section-logos" aria-label="Isapres con las que trabajamos">
+  <div class="container">
+    <p class="section-logos__title">Trabajamos con todas las isapres de Chile</p>
+    <div class="logos-grid">
+
+      <div class="isapre-logo-card fade-up">
+        <div class="isapre-logo-card__img">
+          <picture>
+            <source srcset="{% static 'img/logo-banmedica.webp' %}" type="image/webp">
+            <img src="{% static 'img/logo-banmedica.png' %}" alt="Isapre Banmédica" loading="lazy" width="160" height="44">
+          </picture>
+        </div>
+      </div>
+
+      <div class="isapre-logo-card fade-up">
+        <div class="isapre-logo-card__img">
+          <picture>
+            <source srcset="{% static 'img/logo-colmena.webp' %}" type="image/webp">
+            <img src="{% static 'img/logo-colmena.png' %}" alt="Colmena Golden Cross" loading="lazy" width="160" height="44">
+          </picture>
+        </div>
+      </div>
+
+      <div class="isapre-logo-card fade-up">
+        <div class="isapre-logo-card__img">
+          <img src="{% static 'img/logo-cruzblanca.svg' %}" alt="Cruz Blanca Isapre" loading="lazy" width="160" height="44">
+        </div>
+      </div>
+
+      <div class="isapre-logo-card fade-up">
+        <div class="isapre-logo-card__img">
+          <picture>
+            <source srcset="{% static 'img/logo-consalud.webp' %}" type="image/webp">
+            <img src="{% static 'img/logo-consalud.png' %}" alt="Consalud Isapre" loading="lazy" width="160" height="44">
+          </picture>
+        </div>
+      </div>
+
+      <div class="isapre-logo-card fade-up">
+        <div class="isapre-logo-card__img">
+          <img src="{% static 'img/logo-esencial.svg' %}" alt="Isapre Esencial" loading="lazy" width="160" height="44">
+        </div>
+      </div>
+
+      <div class="isapre-logo-card fade-up">
+        <div class="isapre-logo-card__img">
+          <img src="{% static 'img/logo-nuevamasvida.svg' %}" alt="Isapre Nueva Masvida" loading="lazy" width="160" height="44">
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     CÓMO FUNCIONA
+══════════════════════════════════════════ -->
+<section class="section-como" id="como-funciona">
+  <div class="container">
+    <div class="section-header fade-up">
+      <div class="section-header__tag">Proceso simple</div>
+      <h2>¿Cómo funciona la asesoría?</h2>
+      <p>Sin papeles, sin complicaciones. Todo en línea y a tu ritmo.</p>
+    </div>
+
+    <div class="pasos-grid">
+      <div class="paso-card fade-up">
+        <div class="paso-num">01</div>
+        <div class="paso-icon" style="background:#E6F1FB;">
+          <span aria-hidden="true">🔍</span>
+        </div>
+        <h3>Haz tu diagnóstico</h3>
+        <p>
+          Responde 4 preguntas sobre tu situación actual, renta y familia.
+          El diagnóstico es completamente gratuito y anónimo. Sin datos personales
+          en esta etapa.
+        </p>
+      </div>
+
+      <div class="paso-card fade-up">
+        <div class="paso-num">02</div>
+        <div class="paso-icon" style="background:#E1F5EE;">
+          <span aria-hidden="true">📊</span>
+        </div>
+        <h3>Recibe tu comparativa</h3>
+        <p>
+          Te mostramos las isapres más convenientes para tu perfil con los planes
+          específicos que aplican a tu renta y clínica preferente. Todo claro, sin
+          letra chica.
+        </p>
+      </div>
+
+      <div class="paso-card fade-up">
+        <div class="paso-num">03</div>
+        <div class="paso-icon" style="background:#FFFBEB;">
+          <span aria-hidden="true">✅</span>
+        </div>
+        <h3>Decide sin presión</h3>
+        <p>
+          Un asesor certificado te llama para resolver todas tus dudas y formalizar
+          el cambio si te convence. Si no quieres cambiarte, sin problema.
+          Zero presión.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     TABLA COMPARATIVA ISAPRES 2026
+══════════════════════════════════════════ -->
+<section class="section-comparativa" id="comparativa" aria-label="Comparativa de isapres Chile 2026">
+  <div class="container">
+    <div class="section-header fade-up">
+      <div class="section-header__tag">Comparativa 2026 · Actualizado junio 2026</div>
+      <h2>Planes más populares por isapre</h2>
+      <p>Planes reales disponibles en 2026. El precio varía por tu edad (factor etario) y número de cargas.</p>
+    </div>
+
+    <div class="envivo-strip fade-up">
+      <span class="envivo-badge">🔴 EN VIVO</span>
+      <span class="envivo-label">Mejor precio · mayor cobertura:</span>
+      <div class="envivo-planes">
+        <div class="envivo-plan">
+          <span class="envivo-plan__nombre">Consalud Activo</span>
+          <span class="envivo-plan__precio">desde $43.000/mes</span>
+          <span class="envivo-plan__cob">85% cobertura en red</span>
+        </div>
+        <div class="envivo-plan">
+          <span class="envivo-plan__nombre">Colmena Star Plus</span>
+          <span class="envivo-plan__precio">desde $45.000/mes</span>
+          <span class="envivo-plan__cob">90% cobertura en red</span>
+        </div>
+        <div class="envivo-plan envivo-plan--star">
+          <span class="envivo-plan__tag">⭐ N°1 en cobertura</span>
+          <span class="envivo-plan__nombre">Banmédica Plan Lite</span>
+          <span class="envivo-plan__precio">desde $66.800/mes</span>
+          <span class="envivo-plan__cob">Cirugías sin tope · Red VidaIntegra</span>
+        </div>
+      </div>
+    </div>
+
+    <p class="tabla-scroll-hint">← Desliza para ver toda la tabla →</p>
+
+    <div style="overflow-x:auto;" class="fade-up">
+      <table class="tabla-comparativa" role="table" aria-label="Comparativa planes isapres 2026">
+        <thead>
+          <tr>
+            <th scope="col">Isapre</th>
+            <th scope="col">Plan destacado 2026</th>
+            <th scope="col">Precio base<br><small>(desde, UF/mes)</small></th>
+            <th scope="col">Cobertura<br>hospitalaria</th>
+            <th scope="col">Clínica<br>Alemana</th>
+            <th scope="col">Clínica<br>Las Condes</th>
+            <th scope="col">Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="fila-destacada">
+            <td><strong>Banmédica</strong> <span class="tag-destacado">N°1 en cobertura</span></td>
+            <td>
+              <strong>Signo Preferente VidaIntegra</strong><br>
+              <small style="color:var(--gris-texto)">Red VidaIntegra + libre elección · 246 planes</small>
+            </td>
+            <td><strong>1,80 UF</strong><br><small>≈ $70.700/mes*</small></td>
+            <td><span class="check">Hasta 100%</span></td>
+            <td><span class="check">✓</span></td>
+            <td><span class="check">✓</span></td>
+            <td><a href="#inicio" class="tabla-cta">Cotizar gratis</a></td>
+          </tr>
+          <tr class="fila-destacada">
+            <td><strong>Banmédica</strong> <span class="tag-destacado">Plan Lite</span></td>
+            <td>
+              <strong>Salud Clásico Gold Lite</strong><br>
+              <small style="color:var(--gris-texto)">Modular "Arma tu Plan" · Cirugías sin tope · Red VidaIntegra</small>
+            </td>
+            <td><strong>1,70 UF</strong><br><small>≈ $66.800/mes*</small></td>
+            <td>
+              <span class="check">Sin tope cirugías</span><br>
+              <small style="color:var(--gris-texto)">50% bonif. consultas · Copago urgencia fijo 1,3–2,2 UF</small>
+            </td>
+            <td><span class="check">✓ Lite Ultra</span></td>
+            <td><span class="check">✓ Lite Ultra</span></td>
+            <td><a href="#inicio" class="tabla-cta">Cotizar gratis</a></td>
+          </tr>
+          <tr class="fila-destacada">
+            <td><strong>Banmédica</strong> <span class="tag-destacado">Económico</span></td>
+            <td>
+              <strong>Salud Conecta Clásico</strong><br>
+              <small style="color:var(--gris-texto)">Plan de entrada · Red preferente</small>
+            </td>
+            <td><strong>0,94 UF</strong><br><small>≈ $36.900/mes*</small></td>
+            <td><span class="check">80% en red</span></td>
+            <td><span class="cross">—</span></td>
+            <td><span class="check">✓</span></td>
+            <td><a href="#inicio" class="tabla-cta">Cotizar gratis</a></td>
+          </tr>
+          <tr>
+            <td><strong>Colmena Golden Cross</strong> <span class="tag-destacado">Más amplia</span></td>
+            <td>
+              <strong>Colmena Star Plus</strong><br>
+              <small style="color:var(--gris-texto)">448 planes disponibles</small>
+            </td>
+            <td><strong>1,15 UF</strong><br><small>≈ $44.000/mes*</small></td>
+            <td><span class="check">90% en red</span></td>
+            <td><span class="check">✓</span></td>
+            <td><span class="check">✓</span></td>
+            <td><a href="#inicio" class="tabla-cta">Cotizar gratis</a></td>
+          </tr>
+          <tr>
+            <td><strong>Consalud</strong></td>
+            <td>
+              <strong>Consalud Activo</strong><br>
+              <small style="color:var(--gris-texto)">La isapre con más afiliados</small>
+            </td>
+            <td><strong>1,10 UF</strong><br><small>≈ $42.000/mes*</small></td>
+            <td><span class="check">85% en red</span></td>
+            <td><span class="cross">—</span></td>
+            <td><span class="check">✓</span></td>
+            <td><a href="#inicio" class="tabla-cta">Cotizar gratis</a></td>
+          </tr>
+          <tr>
+            <td><strong>Cruz Blanca</strong></td>
+            <td>
+              <strong>Cruz Blanca Salud Premium</strong><br>
+              <small style="color:var(--gris-texto)">326 planes disponibles</small>
+            </td>
+            <td><strong>1,30 UF</strong><br><small>≈ $50.000/mes*</small></td>
+            <td><span class="check">85% en red</span></td>
+            <td><span class="cross">—</span></td>
+            <td><span class="check">✓</span></td>
+            <td><a href="#inicio" class="tabla-cta">Cotizar gratis</a></td>
+          </tr>
+          <tr>
+            <td><strong>Nueva Masvida</strong></td>
+            <td>
+              <strong>Masvida Esencial Activo</strong><br>
+              <small style="color:var(--gris-texto)">181 planes disponibles</small>
+            </td>
+            <td><strong>0,80 UF</strong><br><small>≈ $30.000/mes*</small></td>
+            <td><span class="check">80% en red</span></td>
+            <td><span class="cross">—</span></td>
+            <td><span class="cross">—</span></td>
+            <td><a href="#inicio" class="tabla-cta">Cotizar gratis</a></td>
+          </tr>
+          <tr>
+            <td><strong>Esencial</strong></td>
+            <td>
+              <strong>Plan Esencial Básico</strong><br>
+              <small style="color:var(--gris-texto)">Opción económica</small>
+            </td>
+            <td><strong>0,90 UF</strong><br><small>≈ $34.000/mes*</small></td>
+            <td><span class="check">75% en red</span></td>
+            <td><span class="cross">—</span></td>
+            <td><span class="cross">—</span></td>
+            <td><a href="#inicio" class="tabla-cta">Cotizar gratis</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="tabla-notas fade-up">
+      <p><strong>⚠️ Importante:</strong> El precio final depende de tu <strong>factor etario</strong> (edad) y número de cargas (grupo familiar). El precio base mostrado es para un titular de 25–49 años (factor 1,0). Personas mayores de 50 años pueden tener un precio 1,5× a 2,3× mayor.</p>
+      <p><strong>ℹ️ Plan Lite Banmédica:</strong> "Cirugías sin tope" aplica en Red VidaIntegra. La bonificación ambulatoria es del 50% en consultas. La cobertura de "libre elección" (90% hospitalaria) se aplica sobre el arancel Fonasa —  mucho menor al precio real de clínicas privadas. Las variantes "Lite Ultra" permiten elegir clínica preferente (Alemana, Las Condes, UC, U. Los Andes). Tope anual plan: 6.900 UF/persona.</p>
+      <p>* UF junio 2026 ≈ $39.300. Precios referenciales titular tramo 25-49 (factor 1,0). Usa nuestra calculadora para ver el precio ajustado a tu edad.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     ¿POR QUÉ ES GRATIS?
+══════════════════════════════════════════ -->
+<section class="section-gratis" aria-label="Cómo funciona nuestro modelo gratuito">
+  <div class="container">
+    <div class="section-header fade-up">
+      <div class="section-header__tag">Transparencia total</div>
+      <h2>¿Cómo es posible que sea gratis?</h2>
+      <p>Buena pregunta. Aquí no hay letra chica.</p>
+    </div>
+
+    <div class="gratis-grid">
+      <div class="gratis-card fade-up">
+        <div class="gratis-icono">🏦</div>
+        <h3>Las isapres nos pagan una comisión</h3>
+        <p>Cuando concretamos un cambio exitoso, la isapre elegida nos paga un porcentaje — igual que un corredor de propiedades le cobra al vendedor, no al comprador. Tú no pones un peso.</p>
+      </div>
+
+      <div class="gratis-card fade-up">
+        <div class="gratis-icono" style="font-size:2rem;font-weight:900;color:var(--verde-cta);font-family:var(--font-base);">$0</div>
+        <h3>Tú no pagas nada, nunca</h3>
+        <p>Ni al consultar, ni al comparar, ni al cambiarte. Sin cuotas, sin suscripciones, sin sorpresas. Si no te convencemos, simplemente no hacemos nada.</p>
+      </div>
+
+      <div class="gratis-card gratis-card--accent fade-up">
+        <div class="gratis-icono">🎯</div>
+        <h3>Nuestro interés es tu mejor plan</h3>
+        <p>Si te recomendamos algo que no te conviene, no te cambias y no ganamos nada. Por eso siempre apuntamos al plan más conveniente para tu bolsillo, no al que más nos conviene a nosotros.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     CALCULADORA DE AHORRO POR SUELDO
+══════════════════════════════════════════ -->
+<section class="section-calculadora" id="calculadora" aria-label="Calculadora de ahorro en isapre según sueldo">
+  <div class="container">
+    <div class="section-header fade-up">
+      <div class="section-header__tag">Calculadora gratuita · Factor etario incluido</div>
+      <h2>¿Cuánto pagas realmente según tu edad?</h2>
+      <p>El precio de tu plan depende de tu sueldo <strong>y</strong> de tu factor etario (edad). Calcula tu valor real en segundos.</p>
+    </div>
+
+    <div class="calc-sueldo-wrap fade-up">
+      <div class="calc-sueldo-grid">
+        <div class="calc-sueldo__input-wrap">
+          <label class="calc-sueldo__label" for="sueldo-input">Tu renta imponible mensual</label>
+          <input type="number" id="sueldo-input" class="calc-sueldo__input"
+                 placeholder="700000" value="700000"
+                 min="300000" max="5000000" step="50000"
+                 aria-label="Ingresa tu renta imponible en pesos chilenos">
+
+          <!-- Factor etario (TFU Circular IF 343) -->
+          <div class="factor-etario-wrap">
+            <div class="factor-etario-row">
+              <div class="factor-etario-field">
+                <label class="calc-sueldo__label" for="edad-tramo">Tu tramo de edad</label>
+                <select id="edad-tramo" class="factor-etario-select" aria-label="Selecciona tu tramo de edad">
+                  <option value="1.04">0 – 1 año (factor 1,04)</option>
+                  <option value="0.38">2 – 4 años (factor 0,38)</option>
+                  <option value="0.49">5 – 17 años (factor 0,49)</option>
+                  <option value="0.62">18 – 24 años (factor 0,62)</option>
+                  <option value="1.00" selected>25 – 49 años (factor 1,00)</option>
+                  <option value="1.57">50 – 64 años (factor 1,57)</option>
+                  <option value="2.37">65 años o más (factor 2,37)</option>
+                </select>
+              </div>
+              <div class="factor-etario-badge-wrap">
+                <div class="factor-etario-badge">
+                  Factor: <strong id="badge-factor">×1,00</strong>
+                </div>
+                <div class="factor-etario-hint">Tabla Unificada Supersalud 2024</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="ahorro-ranges" id="ahorro-ranges-grid">
+            <div class="ahorro-range-card">
+              <div class="ahorro-range-card__sueldo">Sueldo $500K</div>
+              <div class="ahorro-range-card__monto">$15.000</div>
+              <div class="ahorro-range-card__sub">ahorro estimado/mes</div>
+            </div>
+            <div class="ahorro-range-card">
+              <div class="ahorro-range-card__sueldo">Sueldo $800K</div>
+              <div class="ahorro-range-card__monto">$28.000</div>
+              <div class="ahorro-range-card__sub">ahorro estimado/mes</div>
+            </div>
+            <div class="ahorro-range-card">
+              <div class="ahorro-range-card__sueldo">Sueldo $1,2M</div>
+              <div class="ahorro-range-card__monto">$42.000</div>
+              <div class="ahorro-range-card__sub">ahorro estimado/mes</div>
+            </div>
+            <div class="ahorro-range-card">
+              <div class="ahorro-range-card__sueldo">Sueldo $2M+</div>
+              <div class="ahorro-range-card__monto">$75.000</div>
+              <div class="ahorro-range-card__sub">ahorro estimado/mes</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="calc-sueldo__result" id="calc-sueldo-result">
+          <div class="calc-sueldo__result-item">
+            <span class="calc-sueldo__result-label">Tu renta ingresada</span>
+            <span class="calc-sueldo__result-val" id="res-sueldo">$700.000</span>
+          </div>
+          <div class="calc-sueldo__result-item">
+            <span class="calc-sueldo__result-label">Tu 7% mensual (cotización)</span>
+            <span class="calc-sueldo__result-val" id="res-7pct">$49.000</span>
+          </div>
+          <div class="calc-sueldo__result-item">
+            <span class="calc-sueldo__result-label">Plan base ajustado a tu edad</span>
+            <span class="calc-sueldo__result-val" id="res-plan">$38.000</span>
+          </div>
+          <div class="calc-sueldo__result-item">
+            <span class="calc-sueldo__result-label">Tu factor etario (TFU)</span>
+            <span class="calc-sueldo__result-val" id="res-factor">×1,00</span>
+          </div>
+          <div class="calc-sueldo__result-item">
+            <span class="calc-sueldo__result-label">Ahorro estimado mensual</span>
+            <span class="calc-sueldo__result-val verde" id="res-ahorro">$11.000 – $28.000</span>
+          </div>
+          <a href="#inicio" class="calc-sueldo__cta">
+            ✓ Obtener mi cotización exacta gratis
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     CIFRAS DESTACADAS
+══════════════════════════════════════════ -->
+<div class="cifras-strip">
+  <div class="container">
+    <div class="cifras-grid">
+      <div class="cifra-item fade-up">
+        <div class="cifra-num">+2.400</div>
+        <div class="cifra-label">familias asesoradas<br>en Chile</div>
+      </div>
+      <div class="cifra-item fade-up">
+        <div class="cifra-num">$42K</div>
+        <div class="cifra-label">ahorro mensual<br>promedio logrado</div>
+      </div>
+      <div class="cifra-item fade-up">
+        <div class="cifra-num">⭐ 4,9</div>
+        <div class="cifra-label">calificación<br>Google Reviews</div>
+      </div>
+      <div class="cifra-item fade-up">
+        <div class="cifra-num">48h</div>
+        <div class="cifra-label">tiempo promedio<br>para cerrar cambio</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     TESTIMONIOS
+══════════════════════════════════════════ -->
+<section class="section-testimonios" id="testimonios">
+  <div class="container">
+    <div class="section-header fade-up">
+      <div class="section-header__tag">Testimonios reales</div>
+      <h2>Lo que dicen nuestros clientes</h2>
+      <p>Personas reales que ahorraron con nuestra asesoría gratuita.</p>
+    </div>
+
+    <div class="testimonios-grid">
+
+      <article class="testimonio-card fade-up">
+        <div class="testimonio-stars" aria-label="5 estrellas">★★★★★</div>
+        <div class="testimonio-ahorro">Ahorra $52.000/mes</div>
+        <blockquote>
+          "Llevaba 3 años pagando de más en Banmédica. En 2 días me cambiaron a
+          Colmena con el mismo nivel de cobertura para la Clínica Alemana.
+          No lo podía creer. El proceso fue rapidísimo y sin ningún trámite de mi parte."
+        </blockquote>
+        <div class="testimonio-author">
+          <div class="testimonio-avatar" style="background:#0C447C;">MP</div>
+          <div>
+            <div class="testimonio-name">María Paz R.</div>
+            <div class="testimonio-meta">Profesora · Santiago · Fonasa → Colmena</div>
+          </div>
+        </div>
+      </article>
+
+      <article class="testimonio-card fade-up">
+        <div class="testimonio-stars" aria-label="5 estrellas">★★★★★</div>
+        <div class="testimonio-ahorro">Ahorra $38.000/mes</div>
+        <blockquote>
+          "Mi isapre subió el precio en marzo y me dijeron que tenía que esperar hasta
+          diciembre para cambiarme. ¡Mentira! AsesoríasIsapres me explicó mis derechos
+          y me cambié en 48 horas. Excelente servicio."
+        </blockquote>
+        <div class="testimonio-author">
+          <div class="testimonio-avatar" style="background:#1D9E75;">CG</div>
+          <div>
+            <div class="testimonio-name">Carlos González</div>
+            <div class="testimonio-meta">Ingeniero · Valparaíso · Cambio por alza</div>
+          </div>
+        </div>
+      </article>
+
+      <article class="testimonio-card fade-up">
+        <div class="testimonio-stars" aria-label="5 estrellas">★★★★★</div>
+        <div class="testimonio-ahorro">Ahorra $67.000/mes</div>
+        <blockquote>
+          "Con 3 hijos el plan familiar era carísimo. Gracias al diagnóstico encontraron
+          un plan que cubre a toda mi familia por $67.000 menos al mes. Ese dinero ahora
+          va a los gastos de los niños. Increíble."
+        </blockquote>
+        <div class="testimonio-author">
+          <div class="testimonio-avatar" style="background:#185FA5;">AL</div>
+          <div>
+            <div class="testimonio-name">Ana Lucía M.</div>
+            <div class="testimonio-meta">Administradora · Concepción · Familia 3 hijos</div>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     FAQ
+══════════════════════════════════════════ -->
+<section class="section-faq" id="preguntas">
+  <div class="container">
+    <div class="section-header fade-up">
+      <div class="section-header__tag">Preguntas frecuentes</div>
+      <h2>Resolvemos tus dudas</h2>
+    </div>
+
+    <div class="faq-list" role="list">
+
+      <div class="faq-item" role="listitem">
+        <button class="faq-question" aria-expanded="false">
+          ¿La asesoría de isapre tiene costo?
+          <span class="faq-icon" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-answer">
+          No, nuestra asesoría es <strong>completamente gratuita y sin compromiso</strong>.
+          No pagas nada por comparar ni por recibir propuestas de planes. Nuestro ingreso
+          proviene de un acuerdo con las isapres, no de ti.
+        </div>
+      </div>
+
+      <div class="faq-item" role="listitem">
+        <button class="faq-question" aria-expanded="false">
+          ¿Puedo cambiarme de isapre si subió el precio?
+          <span class="faq-icon" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-answer">
+          Sí. En 2026, si tu isapre subió el precio de tu plan (hasta el tope ICSA de 3,5%)
+          y tú <strong>no aceptaste el alza</strong>, tienes derecho legal a cambiarte en
+          cualquier momento, sin necesidad de esperar tu mes de aniversario ni cumplir
+          ningún plazo adicional.
+        </div>
+      </div>
+
+      <div class="faq-item" role="listitem">
+        <button class="faq-question" aria-expanded="false">
+          ¿Cuándo me puedo cambiar de isapre normalmente?
+          <span class="faq-icon" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-answer">
+          Normalmente puedes cambiarte <strong>una vez al año</strong>, en el mes de
+          aniversario de tu contrato. Sin embargo, si tu isapre aumentó el precio y no
+          aceptaste el alza, puedes cambiarte en cualquier mes sin penalización alguna.
+          Un asesor te confirma cuál es tu caso específico.
+        </div>
+      </div>
+
+      <div class="faq-item" role="listitem">
+        <button class="faq-question" aria-expanded="false">
+          ¿Qué datos necesito para cotizar una isapre?
+          <span class="faq-icon" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-answer">
+          Solo necesitas tu <strong>nombre y teléfono</strong>. Si tienes a mano tu renta
+          imponible aproximada y sabes qué clínica prefieres, eso nos ayuda a afinar la
+          recomendación. No necesitas llevar documentos en esta etapa inicial.
+        </div>
+      </div>
+
+      <div class="faq-item" role="listitem">
+        <button class="faq-question" aria-expanded="false">
+          ¿Cuánto es el 7% de mi sueldo para isapre?
+          <span class="faq-icon" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-answer">
+          El <strong>7% de tu renta imponible</strong> es el monto que se descuenta
+          mensualmente de tu sueldo para cubrir tu salud. Por ejemplo: si ganas
+          $800.000, tu cotización es $56.000/mes. Ese monto cubre planes básicos a
+          intermedios en todas las isapres del mercado. Nuestra calculadora calcula
+          esto automáticamente e incluye tu factor etario.
+        </div>
+      </div>
+
+      <div class="faq-item" role="listitem">
+        <button class="faq-question" aria-expanded="false">
+          ¿Qué es el factor etario y cómo afecta el precio de mi plan?
+          <span class="faq-icon" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-answer">
+          El <strong>factor etario</strong> es un multiplicador que ajusta el precio de tu plan según tu edad.
+          Lo regula la Superintendencia de Salud a través de la Tabla de Factores Unificada (TFU).
+          Por ejemplo, una persona de 25–49 años tiene factor 1,0 (precio base), mientras que
+          una persona de 50–64 años paga ×1,57 y una de 65+ paga ×2,37. Nuestra calculadora
+          aplica tu factor automáticamente para mostrarte el precio real.
+        </div>
+      </div>
+
+      <div class="faq-item" role="listitem">
+        <button class="faq-question" aria-expanded="false">
+          ¿Puedo cambiarme de Fonasa a una isapre?
+          <span class="faq-icon" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-answer">
+          Sí. Si eres trabajador dependiente o independiente cotizante, puedes cambiarte
+          de <strong>Fonasa a una isapre en cualquier momento del año</strong>. El proceso
+          toma entre 24 y 48 horas y nuestro asesor lo tramita por ti sin costo. Solo
+          necesitas que tu cotización del 7% sea suficiente para el plan elegido. Haz el
+          diagnóstico gratuito y te indicamos si aplicas.
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     CTA FINAL
+══════════════════════════════════════════ -->
+<section class="section-cta-final" id="contacto">
+  <div class="container">
+    <div class="cta-final__inner">
+
+      <div class="cta-final__copy fade-up">
+        <h2>¿Listo para pagar menos por tu salud?</h2>
+        <p>
+          Agenda una asesoría gratuita. Nuestros expertos comparan todas las
+          opciones disponibles para tu perfil y te ayudan a tomar la mejor
+          decisión sin presión.
+        </p>
+        <ul class="cta-final__bullets">
+          <li>Sin costo ni compromiso de ningún tipo</li>
+          <li>Respuesta en menos de 30 minutos hábiles</li>
+          <li>Asesor certificado y acreditado por la Superintendencia</li>
+          <li>Tramitamos el cambio por ti de principio a fin</li>
+          <li>Datos protegidos bajo Ley 19.628 de Chile</li>
+        </ul>
+      </div>
+
+      <div class="cta-final__form-wrap fade-up">
+        <h3>Solicita tu asesoría gratis</h3>
+        <p>Un asesor te contacta en menos de 30 minutos</p>
+
+        <form id="lead-form-final" novalidate>
+          {% csrf_token %}
+          <input type="hidden" name="website" value="">
+          <div class="form-group">
+            <label for="nombre-final">Nombre completo</label>
+            <input type="text" id="nombre-final" name="nombre" class="form-input"
+                   placeholder="Tu nombre completo" autocomplete="name" required>
+            <div class="form-error" id="error-nombre-final"></div>
+          </div>
+          <div class="form-group">
+            <label for="rut-final">RUT</label>
+            <input type="text" id="rut-final" name="rut" class="form-input"
+                   placeholder="12.345.678-9" autocomplete="off" inputmode="text"
+                   maxlength="12" required>
+            <div class="form-error" id="error-rut-final"></div>
+          </div>
+          <div class="form-group">
+            <label for="telefono-final">Celular</label>
+            <input type="tel" id="telefono-final" name="telefono" class="form-input"
+                   placeholder="9 1234 5678" autocomplete="tel" inputmode="tel" required>
+            <div class="form-error" id="error-telefono-final"></div>
+          </div>
+          <div class="form-group">
+            <label for="email-final">Correo electrónico</label>
+            <input type="email" id="email-final" name="email" class="form-input"
+                   placeholder="correo@ejemplo.cl" autocomplete="email" required>
+            <div class="form-error" id="error-email-final"></div>
+          </div>
+          <div class="form-group">
+            <label for="region-final">Tu región</label>
+            <select id="region-final" name="region" class="form-input" aria-label="Selecciona tu región">
+              <option value="">Selecciona tu región</option>
+              <option value="rm">Región Metropolitana</option>
+              <option value="v">Valparaíso</option>
+              <option value="viii">Biobío</option>
+              <option value="ix">La Araucanía</option>
+              <option value="xiv">Los Ríos</option>
+              <option value="x">Los Lagos</option>
+              <option value="vi">O'Higgins</option>
+              <option value="vii">Maule</option>
+              <option value="xvi">Ñuble</option>
+              <option value="xi">Aysén</option>
+              <option value="xii">Magallanes</option>
+              <option value="iv">Coquimbo</option>
+              <option value="iii">Atacama</option>
+              <option value="ii">Antofagasta</option>
+              <option value="i">Tarapacá</option>
+              <option value="xv">Arica y Parinacota</option>
+            </select>
+            <div class="form-error" id="error-region-final"></div>
+          </div>
+
+          <button type="submit" class="cta-primary">
+            ✓ Solicitar asesoría gratuita
+          </button>
+        </form>
+
+        <div class="cta-divider">
+          <span>o también puedes</span>
+        </div>
+
+        <a href="https://wa.me/{{ whatsapp_number }}?text=Hola%2C+necesito+asesor%C3%ADa+para+cotizar+mi+isapre"
+           class="cta-whatsapp"
+           target="_blank"
+           rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+          </svg>
+          Escribir por WhatsApp
+        </a>
+
+        <p class="privacy-note" style="margin-top:var(--space-4);">
+          Al enviar aceptas nuestra <a href="/privacidad/">política de privacidad</a>.
+          Tus datos solo se usan para entregarte una cotización gratuita.
+        </p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     FOOTER
+══════════════════════════════════════════ -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer__inner">
+      <div class="footer__brand">
+        <div class="footer__logo">
+          <img src="{% static 'img/logo-oscuro.svg' %}" alt="AsesoríasIsapres.com" width="165" height="38">
+        </div>
+        <p>
+          Asesoría gratuita para cotizar y comparar planes de isapre en Chile.
+          Acreditados por la Superintendencia de Salud.
+        </p>
+        <div class="footer__social">
+          <a href="https://www.instagram.com/ase_isapres" target="_blank" rel="noopener noreferrer" aria-label="Instagram @ase_isapres">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+            </svg>
+          </a>
+          <a href="https://www.facebook.com/profile.php?id=100093992800980" target="_blank" rel="noopener noreferrer" aria-label="Facebook AsesoríasIsapres">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+            </svg>
+          </a>
+          <a href="https://wa.me/{{ whatsapp_number }}" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp +56964345927">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      <div class="footer__col">
+        <h4>Servicios</h4>
+        <ul>
+          <li><a href="#inicio">Diagnóstico gratuito</a></li>
+          <li><a href="#como-funciona">Cómo funciona</a></li>
+          <li><a href="#testimonios">Testimonios</a></li>
+          <li><a href="#preguntas">Preguntas frecuentes</a></li>
+        </ul>
+      </div>
+
+      <div class="footer__col">
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="/privacidad/">Política de privacidad</a></li>
+          <li><a href="/terminos/">Términos de uso</a></li>
+          <li>
+            <a href="https://wa.me/{{ whatsapp_number }}" target="_blank" rel="noopener noreferrer">
+              WhatsApp
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer__bottom">
+      <span>© 2026 AsesoríasIsapres.com · IDS Digital SpA · Arica, Chile</span>
+      <span>Asesoría gratuita en planes de salud · Acreditado Supersalud</span>
+    </div>
+  </div>
+</footer>
+
+{% endblock %}
+
+{% block schema %}
+
+<!-- LocalBusiness + ProfessionalService mejorado -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": ["LocalBusiness", "ProfessionalService"],
+  "name": "AsesoríasIsapres.com",
+  "alternateName": "Asesorías Isapres",
+  "description": "Asesoría gratuita para cotizar y comparar planes de isapre en Chile. Diagnóstico personalizado en 60 segundos según sueldo, edad y clínica preferente.",
+  "url": "https://asesoriasisapres.com",
+  "telephone": "+56964345927",
+  "email": "contacto@asesoriasisapres.com",
+  "logo": "https://asesoriasisapres.com/static/img/logo-oscuro.svg",
+  "image": "https://asesoriasisapres.com/static/img/og-image.jpg",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Arica",
+    "addressRegion": "Región de Arica y Parinacota",
+    "addressCountry": "CL"
+  },
+  "areaServed": { "@type": "Country", "name": "Chile" },
+  "serviceType": ["Asesoría de isapres", "Cotización de planes de salud", "Comparador de isapres Chile"],
+  "priceRange": "Gratuito",
+  "currenciesAccepted": "CLP",
+  "paymentAccepted": "Gratuito",
+  "openingHoursSpecification": [
+    {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"],
+      "opens": "09:00",
+      "closes": "18:00"
+    }
+  ],
+  "sameAs": [
+    "https://www.instagram.com/ase_isapres",
+    "https://www.facebook.com/profile.php?id=100093992800980"
+  ],
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "4.9",
+    "reviewCount": "127",
+    "bestRating": "5",
+    "worstRating": "1"
+  },
+  "review": [
+    {
+      "@type": "Review",
+      "author": { "@type": "Person", "name": "María Paz R." },
+      "reviewRating": { "@type": "Rating", "ratingValue": "5", "bestRating": "5" },
+      "reviewBody": "Llevaba años en Fonasa y no sabía que con mi sueldo podía tener una isapre buena y económica. Me asesoraron en 20 minutos y en 2 días ya tenía mi plan activado. Ahorro $45.000 al mes.",
+      "datePublished": "2026-03-15"
+    },
+    {
+      "@type": "Review",
+      "author": { "@type": "Person", "name": "Carlos González" },
+      "reviewRating": { "@type": "Rating", "ratingValue": "5", "bestRating": "5" },
+      "reviewBody": "Mi isapre subió el precio en marzo y me dijeron que tenía que esperar hasta diciembre para cambiarme. AsesoríasIsapres me explicó mis derechos y me cambié en 48 horas. Excelente servicio.",
+      "datePublished": "2026-04-02"
+    },
+    {
+      "@type": "Review",
+      "author": { "@type": "Person", "name": "Ana Lucía M." },
+      "reviewRating": { "@type": "Rating", "ratingValue": "5", "bestRating": "5" },
+      "reviewBody": "Con 3 hijos el plan familiar era carísimo. Gracias al diagnóstico encontraron un plan que cubre a toda mi familia por $67.000 menos al mes.",
+      "datePublished": "2026-02-20"
+    }
+  ]
+}
+</script>
+
+<!-- BreadcrumbList -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Inicio",
+      "item": "https://asesoriasisapres.com"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Cotizar Isapre Gratis",
+      "item": "https://asesoriasisapres.com/#inicio"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Comparar Isapres Chile 2026",
+      "item": "https://asesoriasisapres.com/#comparativa"
+    }
+  ]
+}
+</script>
+
+<!-- FAQPage — 7 preguntas -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "¿La asesoría de isapre tiene costo?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No, nuestra asesoría es completamente gratuita y sin compromiso. No pagas nada por comparar ni por recibir propuestas de planes. Nuestro ingreso proviene de un acuerdo con las isapres, no de ti."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Puedo cambiarme de isapre si subió el precio?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Sí. En 2026, si tu isapre subió el precio de tu plan (hasta el tope ICSA de 3,5%) y tú no aceptaste el alza, tienes derecho legal a cambiarte en cualquier momento, sin necesidad de esperar tu mes de aniversario ni cumplir ningún plazo adicional."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cuándo me puedo cambiar de isapre normalmente?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Normalmente puedes cambiarte una vez al año, en el mes de aniversario de tu contrato. Sin embargo, si tu isapre aumentó el precio y no aceptaste el alza, puedes cambiarte en cualquier mes sin penalización alguna."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Qué datos necesito para cotizar una isapre?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Solo necesitas tu nombre y teléfono. Si tienes a mano tu renta imponible aproximada y sabes qué clínica prefieres, eso nos ayuda a afinar la recomendación. No necesitas llevar documentos en esta etapa inicial."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cuánto es el 7% de mi sueldo para isapre?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "El 7% de tu renta imponible es el monto que se descuenta mensualmente de tu sueldo para cubrir tu salud. Por ejemplo: si ganas $800.000, tu cotización es $56.000 al mes. Ese monto cubre planes básicos a intermedios en todas las isapres."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Qué es el factor etario en una isapre?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "El factor etario es un multiplicador que ajusta el precio base de tu plan según tu edad. Lo regula la Superintendencia de Salud mediante la Tabla de Factores Unificada (TFU). Por ejemplo, una persona de 55 años paga aproximadamente 1,57 veces más que una de 35 años por el mismo plan base."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Puedo cambiarme de Fonasa a una isapre?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Sí. Si eres trabajador dependiente o independiente con cotización, puedes cambiarte de Fonasa a una isapre en cualquier momento del año. El proceso toma entre 24 y 48 horas y tu asesor lo tramita por ti. Solo necesitas que tu sueldo imponible sea suficiente para costear el plan elegido."
+      }
+    }
+  ]
+}
+</script>
+
+<!-- HowTo -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  "name": "Cómo cotizar y comparar isapres en Chile gratis",
+  "description": "Proceso gratuito de 3 pasos para encontrar la mejor isapre según tu renta, edad y familia en Chile.",
+  "totalTime": "PT2M",
+  "supply": [{ "@type": "HowToSupply", "name": "Renta imponible aproximada" }],
+  "tool": [{ "@type": "HowToTool", "name": "Diagnóstico online gratuito" }],
+  "step": [
+    {
+      "@type": "HowToStep",
+      "position": 1,
+      "name": "Haz tu diagnóstico gratis",
+      "text": "Responde 4 preguntas sobre tu situación actual, renta y preferencia de clínica. Completamente gratuito y anónimo.",
+      "url": "https://asesoriasisapres.com/#inicio"
+    },
+    {
+      "@type": "HowToStep",
+      "position": 2,
+      "name": "Recibe tu comparativa personalizada",
+      "text": "Te mostramos las isapres más convenientes para tu perfil con planes específicos, factor etario aplicado y estimación de ahorro mensual.",
+      "url": "https://asesoriasisapres.com/#comparativa"
+    },
+    {
+      "@type": "HowToStep",
+      "position": 3,
+      "name": "Decide sin presión",
+      "text": "Un asesor certificado te llama para resolver todas tus dudas y tramita el cambio por ti si decides cambiarte.",
+      "url": "https://asesoriasisapres.com/#contacto"
+    }
+  ]
+}
+</script>
+
+<!-- Service -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Service",
+  "name": "Cotización y Asesoría de Isapres en Chile",
+  "provider": {
+    "@type": "Organization",
+    "name": "AsesoríasIsapres.com",
+    "url": "https://asesoriasisapres.com"
+  },
+  "serviceType": "Asesoría en salud previsional y comparación de isapres",
+  "description": "Comparamos todas las isapres de Chile: Banmédica, Colmena, Cruz Blanca, Consalud, Nueva Masvida y Esencial. Asesoría 100% gratuita.",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "CLP",
+    "description": "Asesoría y cotización completamente gratuita. Sin compromiso."
+  },
+  "areaServed": { "@type": "Country", "name": "Chile" },
+  "availableChannel": {
+    "@type": "ServiceChannel",
+    "serviceType": "Online y telefónico",
+    "availableLanguage": "Spanish"
+  }
+}
+</script>
+
+{% endblock %}

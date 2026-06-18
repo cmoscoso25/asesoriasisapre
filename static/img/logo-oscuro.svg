@@ -1,0 +1,42 @@
+<svg viewBox="0 0 270 60" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="AsesoríasIsapres.com">
+  <title>AsesoríasIsapres.com</title>
+  <defs>
+    <linearGradient id="shieldGradDark" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#185FA5"/>
+      <stop offset="100%" stop-color="#042C53"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Escudo clásico -->
+  <path d="M28 3 L52 11 L52 32 Q52 48 28 57 Q4 48 4 32 L4 11 Z"
+        fill="url(#shieldGradDark)"
+        stroke="rgba(255,255,255,0.15)"
+        stroke-width="1"/>
+
+  <!-- Pulso cardíaco (ECG) -->
+  <polyline
+    points="8,30 14,30 17,22 20,38 23,26 26,34 29,30 46,30"
+    fill="none"
+    stroke="#1D9E75"
+    stroke-width="2.5"
+    stroke-linecap="round"
+    stroke-linejoin="round"/>
+
+  <!-- Wordmark -->
+  <text x="62" y="25"
+        font-family="Inter,-apple-system,BlinkMacSystemFont,sans-serif"
+        font-weight="700"
+        font-size="17"
+        fill="white"
+        letter-spacing="-0.3">Asesorías<tspan
+          font-weight="300"
+          fill="rgba(255,255,255,0.6)">Isapres</tspan></text>
+
+  <!-- Sub-línea -->
+  <text x="62" y="44"
+        font-family="Inter,-apple-system,BlinkMacSystemFont,sans-serif"
+        font-weight="400"
+        font-size="12"
+        fill="rgba(255,255,255,0.5)"
+        letter-spacing="1.5">ASESORÍA · COTIZACIÓN · SALUD</text>
+</svg>

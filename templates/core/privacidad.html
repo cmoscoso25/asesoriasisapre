@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block meta_title %}Política de Privacidad · AsesoríasIsapres.com{% endblock %}
+{% block meta_description %}Política de privacidad de AsesoríasIsapres.com. Cómo recopilamos, usamos y protegemos tus datos personales conforme a la Ley 19.628 de Chile.{% endblock %}
+
+{% block body %}
+<nav class="nav">
+  <div class="container">
+    <div class="nav__inner">
+      <a href="/" class="nav__logo" aria-label="AsesoríasIsapres.com — inicio">
+        <img src="{% static 'img/logo-oscuro.svg' %}" alt="AsesoríasIsapres.com" width="185" height="42">
+      </a>
+    </div>
+  </div>
+</nav>
+
+<div style="max-width:760px;margin:0 auto;padding:3rem 1.5rem 5rem;color:#334155;font-size:1rem;line-height:1.8;">
+  <h1 style="font-size:1.875rem;font-weight:700;color:#042C53;margin-bottom:0.5rem;">Política de Privacidad</h1>
+  <p style="color:#64748B;font-size:0.875rem;margin-bottom:2rem;">Última actualización: 14 de junio de 2026</p>
+
+  <p>En <strong>AsesoríasIsapres.com</strong>, operado por IDS Digital SpA (en adelante "nosotros"), nos comprometemos a proteger tu privacidad. Esta política describe cómo recopilamos, usamos y protegemos tu información personal, de acuerdo con la <strong>Ley N° 19.628 sobre Protección de la Vida Privada</strong> de Chile.</p>
+
+  <h2 style="font-size:1.25rem;font-weight:700;color:#042C53;margin-top:2rem;">1. Datos que recopilamos</h2>
+  <p>Cuando completas nuestro formulario de asesoría, recopilamos:</p>
+  <ul style="margin-left:1.5rem;">
+    <li>Nombre completo</li>
+    <li>Número de teléfono celular</li>
+    <li>Correo electrónico (opcional)</li>
+    <li>Información de diagnóstico: situación de salud, renta imponible aproximada, número de cargas, clínica preferente</li>
+    <li>Dirección IP y parámetros UTM de origen de visita (datos técnicos)</li>
+  </ul>
+
+  <h2 style="font-size:1.25rem;font-weight:700;color:#042C53;margin-top:2rem;">2. Finalidad del tratamiento</h2>
+  <p>Usamos tus datos exclusivamente para:</p>
+  <ul style="margin-left:1.5rem;">
+    <li>Entregarte una cotización y asesoría gratuita personalizada de planes de isapre</li>
+    <li>Contactarte por teléfono o WhatsApp para presentarte opciones</li>
+    <li>Tramitar el cambio de isapre si lo solicitas</li>
+    <li>Mejorar nuestro servicio mediante análisis estadístico anónimo</li>
+  </ul>
+  <p><strong>No vendemos, cedemos ni compartimos tus datos con terceros</strong>, salvo a las isapres estrictamente necesarias para gestionar tu cotización, y únicamente con tu consentimiento.</p>
+
+  <h2 style="font-size:1.25rem;font-weight:700;color:#042C53;margin-top:2rem;">3. Seguridad</h2>
+  <p>Tus datos se almacenan en servidores seguros con cifrado en tránsito (HTTPS/TLS). Acceso restringido a personal autorizado. Eliminamos tu información si nos lo solicitas.</p>
+
+  <h2 style="font-size:1.25rem;font-weight:700;color:#042C53;margin-top:2rem;">4. Tus derechos</h2>
+  <p>Conforme a la Ley 19.628, tienes derecho a:</p>
+  <ul style="margin-left:1.5rem;">
+    <li><strong>Acceder</strong> a los datos que tenemos sobre ti</li>
+    <li><strong>Rectificar</strong> información incorrecta</li>
+    <li><strong>Cancelar</strong> tus datos de nuestra base</li>
+    <li><strong>Oponerte</strong> al tratamiento de tus datos</li>
+  </ul>
+  <p>Para ejercer estos derechos escríbenos a <a href="mailto:contacto@asesoriasisapres.com" style="color:#0C447C;">contacto@asesoriasisapres.com</a>.</p>
+
+  <h2 style="font-size:1.25rem;font-weight:700;color:#042C53;margin-top:2rem;">5. Cookies</h2>
+  <p>Usamos cookies técnicas necesarias para el funcionamiento del sitio y cookies analíticas (Google Analytics) para medir visitas de forma anónima. Puedes desactivarlas en la configuración de tu navegador.</p>
+
+  <h2 style="font-size:1.25rem;font-weight:700;color:#042C53;margin-top:2rem;">6. Cambios a esta política</h2>
+  <p>Podemos actualizar esta política. Te notificaremos mediante la fecha de "última actualización" en esta misma página.</p>
+
+  <h2 style="font-size:1.25rem;font-weight:700;color:#042C53;margin-top:2rem;">7. Contacto</h2>
+  <p>IDS Digital SpA · Arica, Chile<br>
+  Email: <a href="mailto:contacto@asesoriasisapres.com" style="color:#0C447C;">contacto@asesoriasisapres.com</a></p>
+
+  <p style="margin-top:3rem;">
+    <a href="/" style="color:#0C447C;font-size:0.875rem;">← Volver al inicio</a>
+  </p>
+</div>
+{% endblock %}

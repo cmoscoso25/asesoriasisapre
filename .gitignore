@@ -1,0 +1,12 @@
+.env
+__pycache__/
+*.pyc
+*.pyo
+db.sqlite3
+/static_collected/
+*.log
+.DS_Store
+venv/
+env/
+skills/
+passenger_wsgi.py

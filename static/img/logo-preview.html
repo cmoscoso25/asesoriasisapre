@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vista Previa de Logos — AsesoríasIsapres.com</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --azul: #042C53; --azul-m: #0C447C; --verde: #1D9E75;
+    --gris: #F7F8FA; --borde: #E2E8F0; --texto: #1A1A2E; --sub: #64748B;
+  }
+  body { font-family: 'Inter', sans-serif; background: #F0F4F8; color: var(--texto); }
+
+  .page-header {
+    background: var(--azul);
+    color: white;
+    padding: 2rem;
+    text-align: center;
+  }
+  .page-header h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; }
+  .page-header p { font-size: 0.875rem; color: rgba(255,255,255,0.7); }
+
+  .tabs {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1.5rem 1rem 0;
+    flex-wrap: wrap;
+  }
+  .tab {
+    padding: 0.5rem 1.25rem;
+    border-radius: 9999px;
+    border: 2px solid var(--borde);
+    background: white;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--sub);
+  }
+  .tab.active { background: var(--azul-m); color: white; border-color: var(--azul-m); }
+  .tab:hover:not(.active) { border-color: var(--azul-m); color: var(--azul-m); }
+
+  .propuesta { display: none; padding: 1.5rem; max-width: 1100px; margin: 0 auto; }
+  .propuesta.active { display: block; }
+
+  .prop-title {
+    display: flex; align-items: center; gap: 1rem;
+    margin-bottom: 1.5rem; padding: 1.25rem 1.5rem;
+    background: white; border-radius: 16px; border: 1.5px solid var(--borde);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  }
+  .prop-num {
+    width: 42px; height: 42px; border-radius: 10px;
+    background: var(--azul); color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem; font-weight: 800; flex-shrink: 0;
+  }
+  .prop-info h2 { font-size: 1.1rem; font-weight: 700; color: var(--texto); }
+  .prop-info p { font-size: 0.8rem; color: var(--sub); margin-top: 2px; }
+
+  .preview-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  @media (max-width: 640px) { .preview-grid { grid-template-columns: 1fr; } }
+
+  .preview-box {
+    border-radius: 16px;
+    padding: 2.5rem 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+  }
+  .preview-box.dark { background: var(--azul); }
+  .preview-box.light { background: white; border: 1.5px solid var(--borde); }
+  .preview-box.dark-light { background: linear-gradient(135deg, var(--azul) 50%, white 50%); }
+
+  .preview-label {
+    font-size: 0.65rem; font-weight: 700; letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 3px 10px; border-radius: 9999px;
+    margin-bottom: -0.5rem;
+  }
+  .dark .preview-label { color: rgba(255,255,255,0.5); border: 1px solid rgba(255,255,255,0.15); }
+  .light .preview-label { color: var(--sub); border: 1px solid var(--borde); }
+
+  .size-row {
+    display: flex; align-items: center; gap: 2rem; flex-wrap: wrap;
+    justify-content: center; padding: 1.5rem;
+  }
+  .size-item { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+  .size-item span { font-size: 0.65rem; color: var(--sub); font-weight: 600; }
+
+  .favicon-grid {
+    display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap; justify-content: center;
+    padding: 1.5rem; background: white; border-radius: 16px; border: 1.5px solid var(--borde);
+  }
+  .favicon-item { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+  .favicon-item span { font-size: 0.65rem; color: var(--sub); }
+
+  .section-card {
+    background: white; border-radius: 16px; padding: 1.5rem;
+    border: 1.5px solid var(--borde); margin-bottom: 1rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .section-card h3 {
+    font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.8px; color: var(--sub); margin-bottom: 1rem;
+  }
+
+  /* Mock nav */
+  .mock-nav {
+    background: var(--azul); padding: 0 1.5rem;
+    border-radius: 12px; height: 56px;
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 0.75rem;
+  }
+  .mock-nav-cta {
+    background: var(--verde); color: white;
+    font-size: 0.75rem; font-weight: 600;
+    padding: 0.375rem 0.875rem; border-radius: 9999px;
+  }
+
+  /* Mock hero strip */
+  .mock-hero {
+    background: var(--azul); padding: 1.5rem;
+    border-radius: 12px; margin-bottom: 0.75rem;
+  }
+  .mock-hero p {
+    color: rgba(255,255,255,0.6); font-size: 0.75rem; margin-top: 0.75rem;
+    max-width: 240px;
+  }
+
+  /* Mock footer strip */
+  .mock-footer {
+    background: #111827; padding: 1rem 1.5rem;
+    border-radius: 12px;
+  }
+  .mock-footer p { color: rgba(255,255,255,0.4); font-size: 0.7rem; margin-top: 0.5rem; }
+
+  .badge-elegido {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    background: linear-gradient(90deg, #059669, #1D9E75);
+    color: white; font-size: 0.7rem; font-weight: 700;
+    padding: 4px 12px; border-radius: 9999px;
+    margin-left: 0.75rem;
+  }
+
+  .notas {
+    background: #FFFBEB; border: 1.5px solid #F59E0B;
+    border-radius: 12px; padding: 1rem 1.25rem;
+    font-size: 0.8rem; color: #92400E; line-height: 1.7;
+    margin-top: 1rem;
+  }
+  .notas strong { font-weight: 700; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Vista Previa de Logos — AsesoríasIsapres.com</h1>
+  <p>3 propuestas con variantes sobre fondo oscuro, claro y mockup de la web</p>
+</div>
+
+<!-- Tabs -->
+<div class="tabs">
+  <button class="tab active" onclick="showProp(1, this)">Propuesta 1 — Shield Hex</button>
+  <button class="tab" onclick="showProp(2, this)">Propuesta 2 — Pulse &amp; Cross</button>
+  <button class="tab" onclick="showProp(3, this)">Propuesta 3 — Minimal Mark</button>
+</div>
+
+<!-- ══════════════════════════════
+     PROPUESTA 1 — SHIELD HEX
+══════════════════════════════ -->
+<div class="propuesta active" id="prop-1">
+  <div class="prop-title">
+    <div class="prop-num">1</div>
+    <div class="prop-info">
+      <h2>Shield Hex <span class="badge-elegido">★ Recomendado</span></h2>
+      <p>Escudo hexagonal con gradiente azul→verde · Cruz médica blanca · Wordmark Inter 700 · Transmite: protección, salud, confianza institucional</p>
+    </div>
+  </div>
+
+  <!-- Variantes oscuro / claro -->
+  <div class="preview-grid">
+    <div class="preview-box dark">
+      <span class="preview-label">Sobre fondo oscuro (nav / hero)</span>
+
+      <!-- LOGO 1 DARK — SVG INLINE -->
+      <svg viewBox="0 0 260 56" xmlns="http://www.w3.org/2000/svg" width="220">
+        <!-- Hexágono/escudo con gradiente -->
+        <defs>
+          <linearGradient id="grad1d" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#0C447C"/>
+            <stop offset="100%" style="stop-color:#1D9E75"/>
+          </linearGradient>
+          <filter id="shadow1">
+            <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="rgba(0,0,0,0.3)"/>
+          </filter>
+        </defs>
+        <!-- Fondo del ícono -->
+        <rect x="2" y="2" width="52" height="52" rx="14" fill="url(#grad1d)" filter="url(#shadow1)"/>
+        <!-- Cruz médica dentro -->
+        <rect x="24" y="13" width="8" height="30" rx="3" fill="white"/>
+        <rect x="13" y="23" width="30" height="10" rx="3" fill="white"/>
+        <!-- Wordmark -->
+        <text x="64" y="24" font-family="Inter,-apple-system,sans-serif" font-weight="800" font-size="18" fill="white" letter-spacing="-0.5">Asesorías</text>
+        <text x="64" y="43" font-family="Inter,-apple-system,sans-serif" font-weight="400" font-size="14" fill="rgba(255,255,255,0.65)" letter-spacing="0.8">ISAPRES.COM</text>
+      </svg>
+
+      <!-- Tamaño compacto (nav) -->
+      <svg viewBox="0 0 260 56" xmlns="http://www.w3.org/2000/svg" width="160">
+        <defs>
+          <linearGradient id="grad1d2" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#0C447C"/>
+            <stop offset="100%" style="stop-color:#1D9E75"/>
+          </linearGradient>
+        </defs>
+        <rect x="2" y="2" width="52" height="52" rx="14" fill="url(#grad1d2)"/>
+        <rect x="24" y="13" width="8" height="30" rx="3" fill="white"/>
+        <rect x="13" y="23" width="30" height="10" rx="3" fill="white"/>
+        <text x="64" y="24" font-family="Inter,-apple-system,sans-serif" font-weight="800" font-size="18" fill="white" letter-spacing="-0.5">Asesorías</text>
+        <text x="64" y="43" font-family="Inter,-apple-system,sans-serif" font-weight="400" font-size="14" fill="rgba(255,255,255,0.65)" letter-spacing="0.8">ISAPRES.COM</text>
+      </svg>
+    </div>
+
+    <div class="preview-box light">
+      <span class="preview-label">Sobre fondo blanco (emails / docs)</span>
+
+      <svg viewBox="0 0 260 56" xmlns="http://www.w3.org/2000/svg" width="220">
+        <defs>
+          <linearGradient id="grad1l" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#0C447C"/>
+            <stop offset="100%" style="stop-color:#1D9E75"/>
+          </linearGradient>
+        </defs>
+        <rect x="2" y="2" width="52" height="52" rx="14" fill="url(#grad1l)"/>
+        <rect x="24" y="13" width="8" height="30" rx="3" fill="white"/>
+        <rect x="13" y="23" width="30" height="10" rx="3" fill="white"/>
+        <text x="64" y="24" font-family="Inter,-apple-system,sans-serif" font-weight="800" font-size="18" fill="#042C53" letter-spacing="-0.5">Asesorías</text>
+        <text x="64" y="43" font-family="Inter,-apple-system,sans-serif" font-weight="500" font-size="14" fill="#64748B" letter-spacing="0.8">ISAPRES.COM</text>
+      </svg>
+
+      <!-- Solo ícono -->
+      <svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg" width="56">
+        <defs>
+          <linearGradient id="grad1l2" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#0C447C"/>
+            <stop offset="100%" style="stop-color:#1D9E75"/>
+          </linearGradient>
+        </defs>
+        <rect x="1" y="1" width="54" height="54" rx="15" fill="url(#grad1l2)"/>
+        <rect x="23" y="12" width="10" height="32" rx="4" fill="white"/>
+        <rect x="12" y="23" width="32" height="10" rx="4" fill="white"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Sizes -->
+  <div class="section-card">
+    <h3>Escala de tamaños</h3>
+    <div class="size-row" style="background:#F7F8FA; border-radius:12px;">
+      <div class="size-item">
+        <svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg" width="16">
+          <defs><linearGradient id="g1s1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#0C447C"/><stop offset="100%" style="stop-color:#1D9E75"/></linearGradient></defs>
+          <rect width="56" height="56" rx="12" fill="url(#g1s1)"/>
+          <rect x="23" y="12" width="10" height="32" rx="3" fill="white"/>
+          <rect x="12" y="23" width="32" height="10" rx="3" fill="white"/>
+        </svg>
+        <span>16px</span>
+      </div>
+      <div class="size-item">
+        <svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg" width="32">
+          <defs><linearGradient id="g1s2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#0C447C"/><stop offset="100%" style="stop-color:#1D9E75"/></linearGradient></defs>
+          <rect width="56" height="56" rx="12" fill="url(#g1s2)"/>
+          <rect x="23" y="12" width="10" height="32" rx="3" fill="white"/>
+          <rect x="12" y="23" width="32" height="10" rx="3" fill="white"/>
+        </svg>
+        <span>32px</span>
+      </div>
+      <div class="size-item">
+        <svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg" width="48">
+          <defs><linearGradient id="g1s3" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#0C447C"/><stop offset="100%" style="stop-color:#1D9E75"/></linearGradient></defs>
+          <rect width="56" height="56" rx="12" fill="url(#g1s3)"/>
+          <rect x="23" y="12" width="10" height="32" rx="3" fill="white"/>
+          <rect x="12" y="23" width="32" height="10" rx="3" fill="white"/>
+        </svg>
+        <span>48px</span>
+      </div>
+      <div class="size-item">
+        <svg viewBox="0 0 260 56" xmlns="http://www.w3.org/2000/svg" width="180">
+          <defs><linearGradient id="g1s4" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#0C447C"/><stop offset="100%" style="stop-color:#1D9E75"/></linearGradient></defs>
+          <rect x="1" y="1" width="54" height="54" rx="14" fill="url(#g1s4)"/>
+          <rect x="23" y="12" width="10" height="32" rx="3" fill="white"/>
+          <rect x="12" y="23" width="32" height="10" rx="3" fill="white"/>
+          <text x="64" y="24" font-family="Inter,-apple-system,sans-serif" font-weight="800" font-size="18" fill="#042C53" letter-spacing="-0.5">Asesorías</text>
+          <text x="64" y="43" font-family="Inter,-apple-system,sans-serif" font-weight="500" font-size="14" fill="#64748B" letter-spacing="0.8">ISAPRES.COM</text>
+        </svg>
+        <span>Logo completo</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mockup en contexto real -->
+  <div class="section-card">
+    <h3>Mockup en la web real</h3>
+
+    <!-- Nav -->
+    <div class="mock-nav">
+      <svg viewBox="0 0 260 56" xmlns="http://www.w3.org/2000/svg" height="36">
+        <defs><linearGradient id="gm1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#0C447C"/><stop offset="100%" style="stop-color:#1D9E75"/></linearGradient></defs>
+        <rect x="1" y="1" width="54" height="54" rx="14" fill="url(#gm1)"/>
+        <rect x="23" y="12" width="10" height="32" rx="3" fill="white"/>
+        <rect x="12" y="23" width="32" height="10" rx="3" fill="white"/>
+        <text x="64" y="24" font-family="Inter,-apple-system,sans-serif" font-weight="800" font-size="18" fill="white" letter-spacing="-0.5">Asesorías</text>
+        <text x="64" y="43" font-family="Inter,-apple-system,sans-serif" font-weight="400" font-size="14" fill="rgba(255,255,255,0.65)" letter-spacing="0.8">ISAPRES.COM</text>
+      </svg>
+      <span class="mock-nav-cta">Llamar ahora</span>
+    </div>
+
+    <!-- Hero -->
+    <div class="mock-hero">
+      <svg viewBox="0 0 260 56" xmlns="http://www.w3.org/2000/svg" height="32">
+        <defs><linearGradient id="gm2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#0C447C"/><stop offset="100%" style="stop-color:#1D9E75"/></linearGradient></defs>
+        <rect x="1" y="1" width="54" height="54" rx="14" fill="url(#gm2)"/>
+        <rect x="23" y="12" width="10" height="32" rx="3" fill="white"/>
+        <rect x="12" y="23" width="32" height="10" rx="3" fill="white"/>
+        <text x="64" y="24" font-family="Inter,-apple-system,sans-serif" font-weight="800" font-size="18" fill="white" letter-spacing="-0.5">Asesorías</text>
+        <text x="64" y="43" font-family="Inter,-apple-system,sans-serif" font-weight="400" font-size="14" fill="rgba(255,255,255,0.65)" letter-spacing="0.8">ISAPRES.COM</text>
+      </svg>
+      <p>Encuentra el mejor plan de isapre para tu bolsillo</p>
+    </div>
+
+    <!-- Footer -->
+    <div class="mock-footer">
+      <svg viewBox="0 0 260 56" xmlns="http://www.w3.org/2000/svg" height="28">
+        <defs><linearGradient id="gm3" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#374151"/><stop offset="100%" style="stop-color:#4B5563"/></linearGradient></defs>
+        <rect x="1" y="1" width="54" height="54" rx="14" fill="url(#gm3)"/>
+        <rect x="23" y="12" width="10" height="32" rx="3" fill="rgba(255,255,255,0.6)"/>
+        <rect x="12" y="23" width="32" height="10" rx="3" fill="rgba(255,255,255,0.6)"/>
+        <text x="64" y="24" font-family="Inter,-apple-system,sans-serif" font-weight="800" font-size="18" fill="rgba(255,255,255,0.7)" letter-spacing="-0.5">Asesorías</text>
+        <text x="64" y="43" font-family="Inter,-apple-system,sans-serif" font-weight="400" font-size="14" fill="rgba(255,255,255,0.35)" letter-spacing="0.8">ISAPRES.COM</text>
+      </svg>
+      <p>© 2026 AsesoríasIsapres.com · IDS Digital SpA</p>
+    </div>
+  </div>
+
+  <div class="notas">
+    <strong>Por qué esta propuesta:</strong> El ícono cuadrado redondeado funciona como app icon moderno (igual que apps bancarias: BCI, Santander, Buk). El gradiente azul→verde une los dos colores del sistema visual. La cruz centrada es inequívoca: salud. Wordmark en mayúsculas para "ISAPRES.COM" genera contraste tipográfico y refuerza el dominio. <strong>Recomendado para el lanzamiento.</strong>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     PROPUESTA 2 — PULSE & CROSS
+══════════════════════════════ -->
+<div class="propuesta" id="prop-2">
+  <div class="prop-title">
+    <div class="prop-num" style="background:var(--verde)">2</div>
+    <div class="prop-info">
+      <h2>Pulse &amp; Cross</h2>
+      <p>Escudo clásico + línea de pulso cardíaco integrada · Transmite: salud activa, tecnología, dinamismo · Ideal si el público objetivo es más joven</p>
+    </div>
+  </div>
+
+  <div class="preview-grid">
+    <div class="preview-box dark">
+      <span class="preview-label">Sobre fondo oscuro</span>
+
+      <svg viewBox="0 0 270 60" xmlns="http://www.w3.org/2000/svg" width="220">
+        <defs>
+          <linearGradient id="p2g1" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style="stop-color:#185FA5"/>
+            <stop offset="100%" style="stop-color:#042C53"/>
+          </linearGradient>
+        </defs>
+        <!-- Escudo clásico -->
+        <path d="M28 3 L52 11 L52 32 Q52 48 28 57 Q4 48 4 32 L4 11 Z" fill="url(#p2g1)" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+        <!-- Pulso cardíaco (ECG line) -->
+        <polyline points="8,30 14,30 17,22 20,38 23,26 26,34 29,30 46,30" fill="none" stroke="#1D9E75" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- Wordmark -->
+        <text x="62" y="25" font-family="Inter,-apple-system,sans-serif" font-weight="700" font-size="17" fill="white" letter-spacing="-0.3">Asesorías<tspan font-weight="300" fill="rgba(255,255,255,0.6)">Isapres</tspan></text>
+        <text x="62" y="44" font-family="Inter,-apple-system,sans-serif" font-weight="400" font-size="12" fill="rgba(255,255,255,0.5)" letter-spacing="1.5">ASESORÍA · COTIZACIÓN · SALUD</text>
+      </svg>
+
+      <!-- Compacto -->
+      <svg viewBox="0 0 270 60" xmlns="http://www.w3.org/2000/svg" width="150">
+        <defs>
+          <linearGradient id="p2g1b" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style="stop-color:#185FA5"/><stop offset="100%" style="stop-color:#042C53"/>
+          </linearGradient>
+        </defs>
+        <path d="M28 3 L52 11 L52 32 Q52 48 28 57 Q4 48 4 32 L4 11 Z" fill="url(#p2g1b)" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+        <polyline points="8,30 14,30 17,22 20,38 23,26 26,34 29,30 46,30" fill="none" stroke="#1D9E75" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="62" y="25" font-family="Inter,-apple-system,sans-serif" font-weight="700" font-size="17" fill="white" letter-spacing="-0.3">Asesorías<tspan font-weight="300" fill="rgba(255,255,255,0.6)">Isapres</tspan></text>
+        <text x="62" y="44" font-family="Inter,-apple-system,sans-serif" font-weight="400" font-size="12" fill="rgba(255,255,255,0.5)" letter-spacing="1.5">ASESORÍA · COTIZACIÓN · SALUD</text>
+      </svg>
+    </div>
+
+    <div class="preview-box light">
+      <span class="preview-label">Sobre fondo blanco</span>
+
+      <svg viewBox="0 0 270 60" xmlns="http://www.w3.org/2000/svg" width="220">
+        <defs>
+          <linearGradient id="p2g2" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style="stop-color:#185FA5"/>
+            <stop offset="100%" style="stop-color:#042C53"/>
+          </linearGradient>
+        </defs>
+        <path d="M28 3 L52 11 L52 32 Q52 48 28 57 Q4 48 4 32 L4 11 Z" fill="url(#p2g2)"/>
+        <polyline points="8,30 14,30 17,22 20,38 23,26 26,34 29,30 46,30" fill="none" stroke="#1D9E75" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="62" y="25" font-family="Inter,-apple-system,sans-serif" font-weight="700" font-size="17" fill="#042C53" letter-spacing="-0.3">Asesorías<tspan font-weight="300" fill="#64748B">Isapres</tspan></text>
+        <text x="62" y="44" font-family="Inter,-apple-system,sans-serif" font-weight="400" font-size="12" fill="#94A3B8" letter-spacing="1.5">ASESORÍA · COTIZACIÓN · SALUD</text>
+      </svg>
+
+      <!-- Solo ícono -->
+      <svg viewBox="0 0 56 60" xmlns="http://www.w3.org/2000/svg" width="52">
+        <defs>
+          <linearGradient id="p2g3" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style="stop-color:#185FA5"/>
+            <stop offset="100%" style="stop-color:#042C53"/>
+          </linearGradient>
+        </defs>
+        <path d="M28 3 L52 11 L52 32 Q52 48 28 57 Q4 48 4 32 L4 11 Z" fill="url(#p2g3)"/>
+        <polyline points="8,30 14,30 17,22 20,38 23,26 26,34 29,30 46,30" fill="none" stroke="#6EE7B7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Mockup -->
+  <div class="section-card">
+    <h3>Mockup en la web</h3>
+    <div class="mock-nav">
+      <svg viewBox="0 0 270 60" xmlns="http://www.w3.org/2000/svg" height="36">
+        <defs><linearGradient id="p2mn" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#185FA5"/><stop offset="100%" style="stop-color:#042C53"/></linearGradient></defs>
+        <path d="M28 3 L52 11 L52 32 Q52 48 28 57 Q4 48 4 32 L4 11 Z" fill="url(#p2mn)"/>
+        <polyline points="8,30 14,30 17,22 20,38 23,26 26,34 29,30 46,30" fill="none" stroke="#6EE7B7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="62" y="25" font-family="Inter,-apple-system,sans-serif" font-weight="700" font-size="17" fill="white" letter-spacing="-0.3">Asesorías<tspan font-weight="300" fill="rgba(255,255,255,0.6)">Isapres</tspan></text>
+        <text x="62" y="44" font-family="Inter,-apple-system,sans-serif" font-weight="400" font-size="12" fill="rgba(255,255,255,0.4)" letter-spacing="1.5">ASESORÍA · COTIZACIÓN · SALUD</text>
+      </svg>
+      <span class="mock-nav-cta">Llamar ahora</span>
+    </div>
+    <div class="mock-hero">
+      <svg viewBox="0 0 270 60" xmlns="http://www.w3.org/2000/svg" height="30">
+        <defs><linearGradient id="p2mh" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#185FA5"/><stop offset="100%" style="stop-color:#042C53"/></linearGradient></defs>
+        <path d="M28 3 L52 11 L52 32 Q52 48 28 57 Q4 48 4 32 L4 11 Z" fill="url(#p2mh)"/>
+        <polyline points="8,30 14,30 17,22 20,38 23,26 26,34 29,30 46,30" fill="none" stroke="#6EE7B7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="62" y="25" font-family="Inter,-apple-system,sans-serif" font-weight="700" font-size="17" fill="white">AsesoríasIsapres</text>
+        <text x="62" y="44" font-family="Inter,-apple-system,sans-serif" font-weight="400" font-size="11" fill="rgba(255,255,255,0.4)">ASESORÍA · COTIZACIÓN · SALUD</text>
+      </svg>
+      <p>Encuentra el mejor plan de isapre para tu bolsillo</p>
+    </div>
+  </div>
+
+  <div class="notas">
+    <strong>Por qué esta propuesta:</strong> La línea de pulso cardíaco (ECG) dentro del escudo es visualmente única — ningún competidor la usa. Comunica "salud activa" no solo "protección". El verde del pulso sobre azul profundo crea contraste máximo. La sub-línea "ASESORÍA · COTIZACIÓN · SALUD" refuerza el SEO visual y le dice al usuario exactamente qué hace la empresa.
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     PROPUESTA 3 — MINIMAL MARK
+══════════════════════════════ -->
+<div class="propuesta" id="prop-3">
+  <div class="prop-title">
+    <div class="prop-num" style="background:linear-gradient(135deg,#0C447C,#1D9E75)">3</div>
+    <div class="prop-info">
+      <h2>Minimal Mark</h2>
+      <p>Monograma "AI" en círculo gradiente + wordmark fino · Transmite: tecnología, modernidad, startup · Ideal para diferenciarse de la competencia tradicional</p>
+    </div>
+  </div>
+
+  <div class="preview-grid">
+    <div class="preview-box dark">
+      <span class="preview-label">Sobre fondo oscuro</span>
+
+      <svg viewBox="0 0 270 60" xmlns="http://www.w3.org/2000/svg" width="220">
+        <defs>
+          <linearGradient id="p3g1" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#1D9E75"/>
+            <stop offset="100%" style="stop-color:#0C447C"/>
+          </linearGradient>
+        </defs>
+        <!-- Círculo gradiente -->
+        <circle cx="30" cy="30" r="27" fill="url(#p3g1)"/>
+        <!-- Monograma AI -->
+        <!-- A -->
+        <polygon points="18,43 26,17 30,27 34,17 42,43" fill="none" stroke="white" stroke-width="2.8" stroke-linejoin="round"/>
+        <line x1="21" y1="36" x2="39" y2="36" stroke="white" stroke-width="2.8" stroke-linecap="round"/>
+        <!-- Wordmark vertical stacked -->
+        <text x="68" y="23" font-family="Inter,-apple-system,sans-serif" font-weight="300" font-size="16" fill="white" letter-spacing="3">ASESORÍAS</text>
+        <text x="68" y="42" font-family="Inter,-apple-system,sans-serif" font-weight="700" font-size="16" fill="white" letter-spacing="1">ISAPRES<tspan fill="var(--verde)" font-size="14">.COM</tspan></text>
+      </svg>
+
+      <!-- Solo ícono -->
+      <svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg" width="54">
+        <defs><linearGradient id="p3g1b" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#1D9E75"/><stop offset="100%" style="stop-color:#0C447C"/></linearGradient></defs>
+        <circle cx="30" cy="30" r="29" fill="url(#p3g1b)"/>
+        <polygon points="18,43 26,17 30,27 34,17 42,43" fill="none" stroke="white" stroke-width="2.8" stroke-linejoin="round"/>
+        <line x1="21" y1="36" x2="39" y2="36" stroke="white" stroke-width="2.8" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <div class="preview-box light">
+      <span class="preview-label">Sobre fondo blanco</span>
+
+      <svg viewBox="0 0 270 60" xmlns="http://www.w3.org/2000/svg" width="220">
+        <defs>
+          <linearGradient id="p3g2" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#1D9E75"/>
+            <stop offset="100%" style="stop-color:#0C447C"/>
+          </linearGradient>
+        </defs>
+        <circle cx="30" cy="30" r="27" fill="url(#p3g2)"/>
+        <polygon points="18,43 26,17 30,27 34,17 42,43" fill="none" stroke="white" stroke-width="2.8" stroke-linejoin="round"/>
+        <line x1="21" y1="36" x2="39" y2="36" stroke="white" stroke-width="2.8" stroke-linecap="round"/>
+        <text x="68" y="23" font-family="Inter,-apple-system,sans-serif" font-weight="300" font-size="16" fill="#64748B" letter-spacing="3">ASESORÍAS</text>
+        <text x="68" y="42" font-family="Inter,-apple-system,sans-serif" font-weight="700" font-size="16" fill="#042C53" letter-spacing="1">ISAPRES<tspan fill="#1D9E75" font-size="14">.COM</tspan></text>
+      </svg>
+
+      <!-- Solo ícono pequeño -->
+      <svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg" width="52">
+        <defs><linearGradient id="p3g2b" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#1D9E75"/><stop offset="100%" style="stop-color:#0C447C"/></linearGradient></defs>
+        <circle cx="30" cy="30" r="29" fill="url(#p3g2b)"/>
+        <polygon points="18,43 26,17 30,27 34,17 42,43" fill="none" stroke="white" stroke-width="2.8" stroke-linejoin="round"/>
+        <line x1="21" y1="36" x2="39" y2="36" stroke="white" stroke-width="2.8" stroke-linecap="round"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Tamaños pequeños -->
+  <div class="section-card">
+    <h3>Favicon · App Icon · Tamaños pequeños</h3>
+    <div class="favicon-grid">
+      <div class="favicon-item">
+        <svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg" width="16">
+          <defs><linearGradient id="p3f1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#1D9E75"/><stop offset="100%" style="stop-color:#0C447C"/></linearGradient></defs>
+          <circle cx="30" cy="30" r="29" fill="url(#p3f1)"/>
+          <polygon points="18,43 26,17 30,27 34,17 42,43" fill="none" stroke="white" stroke-width="3.5" stroke-linejoin="round"/>
+          <line x1="21" y1="36" x2="39" y2="36" stroke="white" stroke-width="3.5" stroke-linecap="round"/>
+        </svg>
+        <span>16px</span>
+      </div>
+      <div class="favicon-item">
+        <svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg" width="32">
+          <defs><linearGradient id="p3f2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#1D9E75"/><stop offset="100%" style="stop-color:#0C447C"/></linearGradient></defs>
+          <circle cx="30" cy="30" r="29" fill="url(#p3f2)"/>
+          <polygon points="18,43 26,17 30,27 34,17 42,43" fill="none" stroke="white" stroke-width="3" stroke-linejoin="round"/>
+          <line x1="21" y1="36" x2="39" y2="36" stroke="white" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+        <span>32px favicon</span>
+      </div>
+      <div class="favicon-item">
+        <svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg" width="60">
+          <defs><linearGradient id="p3f3" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#1D9E75"/><stop offset="100%" style="stop-color:#0C447C"/></linearGradient></defs>
+          <circle cx="30" cy="30" r="29" fill="url(#p3f3)"/>
+          <polygon points="18,43 26,17 30,27 34,17 42,43" fill="none" stroke="white" stroke-width="2.8" stroke-linejoin="round"/>
+          <line x1="21" y1="36" x2="39" y2="36" stroke="white" stroke-width="2.8" stroke-linecap="round"/>
+        </svg>
+        <span>60px</span>
+      </div>
+      <div class="favicon-item">
+        <svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg" width="96">
+          <defs><linearGradient id="p3f4" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#1D9E75"/><stop offset="100%" style="stop-color:#0C447C"/></linearGradient></defs>
+          <circle cx="30" cy="30" r="29" fill="url(#p3f4)"/>
+          <polygon points="18,43 26,17 30,27 34,17 42,43" fill="none" stroke="white" stroke-width="2.5" stroke-linejoin="round"/>
+          <line x1="21" y1="36" x2="39" y2="36" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+        <span>96px app icon</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mockup -->
+  <div class="section-card">
+    <h3>Mockup en la web</h3>
+    <div class="mock-nav">
+      <svg viewBox="0 0 270 60" xmlns="http://www.w3.org/2000/svg" height="36">
+        <defs><linearGradient id="p3mn" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#1D9E75"/><stop offset="100%" style="stop-color:#0C447C"/></linearGradient></defs>
+        <circle cx="30" cy="30" r="27" fill="url(#p3mn)"/>
+        <polygon points="18,43 26,17 30,27 34,17 42,43" fill="none" stroke="white" stroke-width="2.8" stroke-linejoin="round"/>
+        <line x1="21" y1="36" x2="39" y2="36" stroke="white" stroke-width="2.8" stroke-linecap="round"/>
+        <text x="68" y="23" font-family="Inter,-apple-system,sans-serif" font-weight="300" font-size="16" fill="rgba(255,255,255,0.7)" letter-spacing="3">ASESORÍAS</text>
+        <text x="68" y="42" font-family="Inter,-apple-system,sans-serif" font-weight="700" font-size="16" fill="white" letter-spacing="1">ISAPRES<tspan fill="#6EE7B7" font-size="14">.COM</tspan></text>
+      </svg>
+      <span class="mock-nav-cta">Llamar ahora</span>
+    </div>
+  </div>
+
+  <div class="notas">
+    <strong>Por qué esta propuesta:</strong> El círculo es la forma más universalmente "app" — Apple, Google, Spotify, todos usan íconos circulares. El monograma "A" es único, memorizable y diferenciador. La tipografía stacked (ASESORÍAS arriba, ISAPRES abajo) con pesos distintos genera jerarquía visual limpia. El verde del ".COM" convierte el dominio en elemento de diseño. Más arriesgado que P1, pero más memorable a largo plazo.
+  </div>
+</div>
+
+<div style="padding:2rem;text-align:center;font-size:0.8rem;color:#94A3B8;">
+  AsesoríasIsapres.com — Logo Preview · IDS Digital SpA · 2026
+</div>
+
+<script>
+function showProp(n, btn) {
+  document.querySelectorAll('.propuesta').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('prop-' + n).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>
