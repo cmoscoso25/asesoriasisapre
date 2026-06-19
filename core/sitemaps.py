@@ -3,10 +3,14 @@ from django.urls import reverse
 from datetime import date
 
 PRIORITY_MAP = {
-    'landing':    1.0,
-    'privacidad': 0.5,
-    'terminos':   0.5,
-    'gracias':    0.3,
+    'landing':           1.0,
+    'comparar_isapres':  0.9,
+    'plan_economico':    0.9,
+    'clinica_davila':    0.85,
+    'clinica_alemana':   0.85,
+    'clinica_las_condes':0.85,
+    'privacidad':        0.3,
+    'terminos':          0.3,
 }
 
 class StaticSitemap(Sitemap):
@@ -14,7 +18,16 @@ class StaticSitemap(Sitemap):
     protocol = 'https'
 
     def items(self):
-        return ['landing', 'privacidad', 'terminos']
+        return [
+            'landing',
+            'comparar_isapres',
+            'plan_economico',
+            'clinica_davila',
+            'clinica_alemana',
+            'clinica_las_condes',
+            'privacidad',
+            'terminos',
+        ]
 
     def location(self, item):
         return reverse(item)

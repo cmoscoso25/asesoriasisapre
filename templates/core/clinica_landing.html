@@ -1,0 +1,294 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block meta_title %}{{ clinica.titulo }}{% endblock %}
+{% block meta_description %}{{ clinica.descripcion }}{% endblock %}
+{% block og_title %}{{ clinica.titulo }}{% endblock %}
+{% block og_desc %}{{ clinica.descripcion }}{% endblock %}
+{% block canonical %}https://asesoriasisapres.com/isapre-clinica-{{ clinica.slug }}/{% endblock %}
+
+{% block body %}
+
+<nav class="nav" id="main-nav" role="navigation" aria-label="Navegación principal">
+  <div class="container">
+    <div class="nav__inner">
+      <a href="/" class="nav__logo" aria-label="AsesoríasIsapres.com — inicio">
+        <img src="{% static 'img/logo-oscuro.svg' %}" alt="AsesoríasIsapres.com" width="185" height="42">
+      </a>
+      <nav class="nav__links-desktop" aria-label="Menú principal">
+        <a href="/">Inicio</a>
+        <a href="/comparar-isapres-chile/">Comparar isapres</a>
+        <a href="/plan-isapre-economico/">Planes económicos</a>
+        <a href="/#preguntas">Preguntas frecuentes</a>
+      </nav>
+      <a href="tel:+56964345927" class="nav__cta">+56 9 6434 5927</a>
+    </div>
+  </div>
+</nav>
+
+<main>
+
+<!-- Hero -->
+<section class="hero" style="padding-top:5rem;padding-bottom:3rem;">
+  <div class="container">
+    <div style="max-width:760px;margin:0 auto;text-align:center;">
+      <div class="hero__badge">Asesoría 100% gratuita · Sin compromiso</div>
+      <h1 style="font-size:clamp(1.8rem,4vw,2.8rem);font-weight:700;color:var(--azul-oscuro);line-height:1.2;margin:1rem 0;">
+        Isapre con cobertura en <em>{{ clinica.nombre }}</em>: planes y precios 2026
+      </h1>
+      <p style="font-size:1.1rem;color:var(--gris-texto);margin-bottom:2rem;line-height:1.6;">
+        {{ clinica.intro }}
+      </p>
+      <a href="#cotizar" class="cta-btn" style="display:inline-block;background:var(--verde);color:white;padding:1rem 2rem;border-radius:10px;font-size:1rem;font-weight:600;text-decoration:none;">
+        Cotizar gratis en 60 segundos →
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Tabla de planes -->
+<section style="padding:3rem 0;background:#F8FAFC;" id="planes">
+  <div class="container">
+    <h2 style="text-align:center;font-size:1.6rem;color:var(--azul-oscuro);margin-bottom:0.5rem;">
+      Planes disponibles con cobertura en {{ clinica.nombre }}
+    </h2>
+    <p style="text-align:center;color:var(--gris-texto);margin-bottom:2rem;">
+      Precios base para cotizante solo, sin cargas. El precio final varía según edad y cargas familiares.
+    </p>
+
+    <div style="overflow-x:auto;">
+      <table style="width:100%;border-collapse:collapse;background:white;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.07);">
+        <thead>
+          <tr style="background:var(--azul-oscuro);color:white;">
+            <th style="padding:1rem;text-align:left;">Isapre</th>
+            <th style="padding:1rem;text-align:left;">Plan</th>
+            <th style="padding:1rem;text-align:right;">Precio UF/mes</th>
+            <th style="padding:1rem;text-align:right;">Precio aprox. CLP</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in planes %}
+          <tr style="border-bottom:1px solid #E5E7EB;">
+            <td style="padding:0.9rem 1rem;">
+              <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:{{ p.dot }};margin-right:0.5rem;"></span>
+              <strong>{{ p.isapre }}</strong>
+            </td>
+            <td style="padding:0.9rem 1rem;color:var(--gris-texto);">{{ p.plan }}</td>
+            <td style="padding:0.9rem 1rem;text-align:right;font-weight:600;">{{ p.precio_uf }} UF</td>
+            <td style="padding:0.9rem 1rem;text-align:right;color:var(--verde);font-weight:700;">
+              ${{ p.clp|floatformat:0 }}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <p style="text-align:center;font-size:0.8rem;color:var(--gris-texto);margin-top:1rem;">
+      * Precios referenciales 2026. UF: $39.300. El precio final incluye factor etario y cargas.
+    </p>
+  </div>
+</section>
+
+<!-- Por qué elegirnos -->
+<section style="padding:3rem 0;">
+  <div class="container">
+    <h2 style="text-align:center;font-size:1.5rem;color:var(--azul-oscuro);margin-bottom:2rem;">
+      ¿Por qué cotizar tu isapre con nosotros?
+    </h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.5rem;">
+      <div style="background:#F8FAFC;border-radius:12px;padding:1.5rem;text-align:center;">
+        <div style="font-size:2rem;margin-bottom:0.75rem;">🆓</div>
+        <h3 style="font-size:1rem;margin-bottom:0.5rem;">100% gratuito</h3>
+        <p style="font-size:0.9rem;color:var(--gris-texto);">No pagas nada. Ni en la asesoría ni en el cambio de isapre.</p>
+      </div>
+      <div style="background:#F8FAFC;border-radius:12px;padding:1.5rem;text-align:center;">
+        <div style="font-size:2rem;margin-bottom:0.75rem;">⚡</div>
+        <h3 style="font-size:1rem;margin-bottom:0.5rem;">Diagnóstico en 60 segundos</h3>
+        <p style="font-size:0.9rem;color:var(--gris-texto);">Solo necesitas tu renta y preferencia de clínica para empezar.</p>
+      </div>
+      <div style="background:#F8FAFC;border-radius:12px;padding:1.5rem;text-align:center;">
+        <div style="font-size:2rem;margin-bottom:0.75rem;">🏥</div>
+        <h3 style="font-size:1rem;margin-bottom:0.5rem;">Especialistas en {{ clinica.nombre }}</h3>
+        <p style="font-size:0.9rem;color:var(--gris-texto);">Conocemos qué planes tienen mejor cobertura en esta red de salud.</p>
+      </div>
+      <div style="background:#F8FAFC;border-radius:12px;padding:1.5rem;text-align:center;">
+        <div style="font-size:2rem;margin-bottom:0.75rem;">📋</div>
+        <h3 style="font-size:1rem;margin-bottom:0.5rem;">Tramitamos el cambio</h3>
+        <p style="font-size:0.9rem;color:var(--gris-texto);">Si decides cambiarte, nosotros hacemos todos los trámites por ti.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Formulario de contacto -->
+<section style="padding:3rem 0;background:var(--azul-oscuro);" id="cotizar">
+  <div class="container">
+    <div style="max-width:520px;margin:0 auto;text-align:center;">
+      <h2 style="color:white;font-size:1.6rem;margin-bottom:0.75rem;">
+        Cotiza tu isapre con cobertura en {{ clinica.nombre }}
+      </h2>
+      <p style="color:rgba(255,255,255,0.75);margin-bottom:2rem;">
+        Un asesor certificado te contactará en menos de 2 horas hábiles.
+      </p>
+
+      <form id="form-clinica-{{ clinica.slug }}" style="background:white;border-radius:16px;padding:2rem;text-align:left;">
+        {% csrf_token %}
+        <div style="margin-bottom:1rem;">
+          <label style="display:block;font-size:0.85rem;font-weight:600;margin-bottom:0.4rem;color:var(--azul-oscuro);">Nombre completo *</label>
+          <input type="text" name="nombre" required placeholder="Tu nombre"
+                 style="width:100%;padding:0.75rem 1rem;border:1.5px solid #D1D5DB;border-radius:8px;font-size:1rem;box-sizing:border-box;">
+        </div>
+        <div style="margin-bottom:1rem;">
+          <label style="display:block;font-size:0.85rem;font-weight:600;margin-bottom:0.4rem;color:var(--azul-oscuro);">Teléfono (WhatsApp) *</label>
+          <input type="tel" name="telefono" required placeholder="+56 9 1234 5678"
+                 style="width:100%;padding:0.75rem 1rem;border:1.5px solid #D1D5DB;border-radius:8px;font-size:1rem;box-sizing:border-box;">
+        </div>
+        <div style="margin-bottom:1.5rem;">
+          <label style="display:block;font-size:0.85rem;font-weight:600;margin-bottom:0.4rem;color:var(--azul-oscuro);">Situación actual</label>
+          <select name="situacion"
+                  style="width:100%;padding:0.75rem 1rem;border:1.5px solid #D1D5DB;border-radius:8px;font-size:1rem;box-sizing:border-box;background:white;">
+            <option value="">Selecciona...</option>
+            <option value="fonasa">Estoy en Fonasa</option>
+            <option value="isapre-cara">Tengo isapre y pago mucho</option>
+            <option value="isapre-subio">Mi isapre subió el precio</option>
+            <option value="comparar">Solo quiero comparar</option>
+          </select>
+        </div>
+        <input type="hidden" name="clinica_preferente" value="{{ clinica.key }}">
+        <button type="submit"
+                style="width:100%;background:var(--verde);color:white;padding:1rem;border:none;border-radius:10px;font-size:1rem;font-weight:700;cursor:pointer;">
+          Quiero mi asesoría gratuita →
+        </button>
+        <p style="font-size:0.75rem;color:var(--gris-texto);text-align:center;margin-top:0.75rem;">
+          Sin compromiso · Tus datos son privados y seguros
+        </p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section style="padding:3rem 0;" id="preguntas">
+  <div class="container" style="max-width:720px;">
+    <h2 style="text-align:center;font-size:1.5rem;color:var(--azul-oscuro);margin-bottom:2rem;">
+      Preguntas frecuentes sobre isapres y {{ clinica.nombre }}
+    </h2>
+
+    <details style="border:1px solid #E5E7EB;border-radius:10px;padding:1rem 1.25rem;margin-bottom:0.75rem;">
+      <summary style="font-weight:600;cursor:pointer;color:var(--azul-oscuro);">¿Todas las isapres tienen cobertura en {{ clinica.nombre }}?</summary>
+      <p style="margin-top:0.75rem;color:var(--gris-texto);line-height:1.6;">No todas. Solo los planes que incluyen {{ clinica.nombre }} en su red preferente tienen cobertura significativa. Los planes que mostramos arriba son los que sí tienen convenio con esta clínica. Un asesor puede explicarte los detalles de cobertura de cada uno.</p>
+    </details>
+
+    <details style="border:1px solid #E5E7EB;border-radius:10px;padding:1rem 1.25rem;margin-bottom:0.75rem;">
+      <summary style="font-weight:600;cursor:pointer;color:var(--azul-oscuro);">¿Puedo atenderme en {{ clinica.nombre }} aunque no esté en mi red preferente?</summary>
+      <p style="margin-top:0.75rem;color:var(--gris-texto);line-height:1.6;">Sí, pero con menor cobertura. Si {{ clinica.nombre }} no está en tu red preferente, pagas como particular con bonificación reducida. Por eso es importante elegir un plan que la incluya explícitamente si es tu clínica favorita.</p>
+    </details>
+
+    <details style="border:1px solid #E5E7EB;border-radius:10px;padding:1rem 1.25rem;margin-bottom:0.75rem;">
+      <summary style="font-weight:600;cursor:pointer;color:var(--azul-oscuro);">¿Cuánto cuesta el cambio de isapre para tener cobertura en {{ clinica.nombre }}?</summary>
+      <p style="margin-top:0.75rem;color:var(--gris-texto);line-height:1.6;">El cambio de isapre no tiene costo. Nuestra asesoría tampoco. Solo pagas la cotización mensual del nuevo plan, que se descuenta de tu sueldo igual que ahora.</p>
+    </details>
+
+    <details style="border:1px solid #E5E7EB;border-radius:10px;padding:1rem 1.25rem;margin-bottom:0.75rem;">
+      <summary style="font-weight:600;cursor:pointer;color:var(--azul-oscuro);">¿Cuánto demora el proceso de cambio?</summary>
+      <p style="margin-top:0.75rem;color:var(--gris-texto);line-height:1.6;">El trámite tarda entre 24 y 72 horas hábiles desde que firmas el contrato. Nosotros coordinamos todo con la isapre para que no tengas que preocuparte de nada.</p>
+    </details>
+  </div>
+</section>
+
+</main>
+
+<!-- Footer mínimo -->
+<footer style="background:var(--azul-oscuro);color:rgba(255,255,255,0.6);text-align:center;padding:1.5rem;font-size:0.85rem;">
+  <a href="/" style="color:rgba(255,255,255,0.6);margin-right:1rem;">Inicio</a>
+  <a href="/privacidad/" style="color:rgba(255,255,255,0.6);margin-right:1rem;">Privacidad</a>
+  <a href="/terminos/" style="color:rgba(255,255,255,0.6);">Términos</a>
+  <br><br>© 2026 AsesoríasIsapres.com · Acreditado Superintendencia de Salud
+</footer>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function(){
+  var form = document.getElementById('form-clinica-{{ clinica.slug }}');
+  if (!form) return;
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    var btn = form.querySelector('button[type=submit]');
+    btn.disabled = true;
+    btn.textContent = 'Enviando...';
+    var data = new FormData(form);
+    var payload = {
+      nombre:    data.get('nombre'),
+      telefono:  data.get('telefono'),
+      situacion: data.get('situacion') || 'comparar',
+      clinica_preferente: '{{ clinica.key }}',
+    };
+    var csrf = data.get('csrfmiddlewaretoken');
+    fetch('/leads/nuevo/', {
+      method: 'POST',
+      headers: {'Content-Type':'application/x-www-form-urlencoded','X-CSRFToken':csrf},
+      body: new URLSearchParams(payload),
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(j){
+      if (j.success) { window.location.href = '/gracias/'; }
+      else {
+        btn.disabled = false;
+        btn.textContent = 'Quiero mi asesoría gratuita →';
+        alert('Revisa los campos e intenta de nuevo.');
+      }
+    })
+    .catch(function(){
+      btn.disabled = false;
+      btn.textContent = 'Quiero mi asesoría gratuita →';
+    });
+  });
+})();
+</script>
+{% endblock %}
+
+{% block schema %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Service",
+  "name": "Asesoría Isapre con cobertura en {{ clinica.nombre }}",
+  "provider": {
+    "@type": "Organization",
+    "name": "AsesoríasIsapres.com",
+    "url": "https://asesoriasisapres.com",
+    "telephone": "+56964345927"
+  },
+  "serviceType": "Asesoría en planes de isapre con cobertura en {{ clinica.nombre }}",
+  "description": "{{ clinica.descripcion }}",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CLP" },
+  "areaServed": { "@type": "Country", "name": "Chile" }
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "¿Todas las isapres tienen cobertura en {{ clinica.nombre }}?",
+      "acceptedAnswer": { "@type": "Answer", "text": "No todas. Solo los planes con convenio preferente en {{ clinica.nombre }} tienen cobertura significativa. Los planes que mostramos son los recomendados para esta clínica." }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cuánto cuesta el cambio de isapre para tener cobertura en {{ clinica.nombre }}?",
+      "acceptedAnswer": { "@type": "Answer", "text": "El cambio de isapre no tiene costo. La asesoría también es gratuita. Solo pagas la cotización mensual del nuevo plan, descontada de tu sueldo." }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cuánto demora el cambio de isapre?",
+      "acceptedAnswer": { "@type": "Answer", "text": "El trámite tarda entre 24 y 72 horas hábiles desde que firmas el contrato. Nuestro asesor coordina todo por ti." }
+    }
+  ]
+}
+</script>
+{% endblock %}
