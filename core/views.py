@@ -85,6 +85,27 @@ def plan_economico(request):
     })
 
 
+@ensure_csrf_cookie
+def isapre_o_fonasa(request):
+    return render(request, 'core/isapre_o_fonasa.html', {
+        'planes': _planes_con_clp('sin-preferencia')[:4],
+    })
+
+
+@ensure_csrf_cookie
+def cuanto_cuesta_isapre(request):
+    return render(request, 'core/cuanto_cuesta_isapre.html', {
+        'planes': _planes_con_clp('sin-preferencia'),
+    })
+
+
+@ensure_csrf_cookie
+def isapre_para_familia(request):
+    return render(request, 'core/isapre_para_familia.html', {
+        'planes': _planes_con_clp('sin-preferencia'),
+    })
+
+
 def robots_txt(request):
     content = """User-agent: *
 Allow: /

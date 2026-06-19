@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block meta_title %}¿Cuánto cuesta una isapre en Chile 2026? Precios y tabla completa{% endblock %}
+{% block meta_description %}Precios de planes de isapre en Chile 2026: desde $31.000 hasta $150.000/mes. Tabla completa con todas las isapres. Calcula tu precio real gratis.{% endblock %}
+{% block canonical %}https://asesoriasisapres.com/cuanto-cuesta-isapre-chile/{% endblock %}
+
+{% block body %}
+<nav class="nav" role="navigation">
+  <div class="container">
+    <div class="nav__inner">
+      <a href="/" class="nav__logo"><img src="{% static 'img/logo-oscuro.svg' %}" alt="AsesoríasIsapres.com" width="185" height="42"></a>
+      <nav class="nav__links-desktop">
+        <a href="/">Inicio</a>
+        <a href="/comparar-isapres-chile/">Comparar isapres</a>
+        <a href="/plan-isapre-economico/">Planes económicos</a>
+        <a href="/isapre-o-fonasa/">Isapre o Fonasa</a>
+      </nav>
+      <a href="tel:+56964345927" class="nav__cta">+56 9 6434 5927</a>
+    </div>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="container">
+    <div style="max-width:700px;margin:0 auto;text-align:center;position:relative;z-index:1;">
+      <div class="hero__badge">Precios actualizados 2026</div>
+      <h1 class="hero__headline">¿Cuánto cuesta una isapre en Chile <em>2026</em>?</h1>
+      <p class="hero__sub">Los planes de isapre van desde $31.000 hasta más de $200.000 al mes. El precio depende de tu edad, cargas familiares y la clínica que prefieres. Aquí te lo explicamos.</p>
+      <a href="#calcular" class="cta-primary" style="display:inline-block;text-decoration:none;padding:0.9rem 2rem;font-size:1rem;">Calcular mi precio real →</a>
+    </div>
+  </div>
+</section>
+
+<main>
+
+<!-- Tabla de precios -->
+<section style="padding:4rem 0;background:var(--gris-fondo);">
+  <div class="container" style="max-width:860px;">
+    <h2 style="text-align:center;font-size:1.5rem;font-weight:700;color:var(--azul-primario);margin-bottom:0.5rem;">Precios de isapres en Chile 2026</h2>
+    <p style="text-align:center;color:var(--gris-texto);margin-bottom:2rem;font-size:0.9rem;">Precios base para cotizante solo sin cargas. UF 2026: $39.300</p>
+    <div style="overflow-x:auto;">
+      <table style="width:100%;border-collapse:collapse;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 4px 24px rgba(4,44,83,0.08);">
+        <thead>
+          <tr style="background:var(--azul-profundo);color:#fff;">
+            <th style="padding:1rem 1.25rem;text-align:left;">Isapre</th>
+            <th style="padding:1rem 1.25rem;text-align:left;">Plan</th>
+            <th style="padding:1rem 1.25rem;text-align:right;">UF/mes</th>
+            <th style="padding:1rem 1.25rem;text-align:right;">CLP/mes (aprox.)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in planes %}
+          <tr style="border-bottom:1px solid var(--gris-borde);">
+            <td style="padding:0.9rem 1.25rem;"><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:{{ p.dot }};margin-right:0.6rem;vertical-align:middle;"></span><strong style="color:var(--azul-primario);">{{ p.isapre }}</strong></td>
+            <td style="padding:0.9rem 1.25rem;color:var(--gris-texto);font-size:0.88rem;">{{ p.plan }}</td>
+            <td style="padding:0.9rem 1.25rem;text-align:right;font-weight:600;color:var(--azul-primario);">{{ p.precio_uf }} UF</td>
+            <td style="padding:0.9rem 1.25rem;text-align:right;font-weight:700;color:var(--verde-oscuro);">${{ p.clp|floatformat:0 }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:0.78rem;color:var(--gris-texto);margin-top:0.75rem;text-align:center;">* Precios base sin factor etario ni cargas. El precio final puede variar.</p>
+  </div>
+</section>
+
+<!-- Explicaciones -->
+<section style="padding:4rem 0;">
+  <div class="container" style="max-width:760px;">
+
+    <h2 style="font-size:1.4rem;font-weight:700;color:var(--azul-primario);margin-bottom:1rem;">¿Qué factores determinan el precio de tu isapre?</h2>
+
+    <div style="display:grid;gap:1.25rem;margin-bottom:2.5rem;">
+      <div style="background:var(--gris-fondo);border-left:4px solid var(--verde-cta);border-radius:0 10px 10px 0;padding:1.25rem 1.5rem;">
+        <h3 style="font-size:1rem;font-weight:700;color:var(--azul-primario);margin-bottom:0.4rem;">1. Tu edad (factor etario)</h3>
+        <p style="color:var(--gris-texto);font-size:0.9rem;line-height:1.65;">A mayor edad, mayor es el precio. Una persona de 50 años puede pagar entre 1,3 y 1,6 veces más que el precio base. Este factor está regulado por la Superintendencia de Salud y es igual para todas las isapres.</p>
+      </div>
+      <div style="background:var(--gris-fondo);border-left:4px solid var(--verde-cta);border-radius:0 10px 10px 0;padding:1.25rem 1.5rem;">
+        <h3 style="font-size:1rem;font-weight:700;color:var(--azul-primario);margin-bottom:0.4rem;">2. Cargas familiares</h3>
+        <p style="color:var(--gris-texto);font-size:0.9rem;line-height:1.65;">Agregar cargas (pareja, hijos) aumenta el precio del plan. Una pareja suma aproximadamente un 49% más sobre el precio base. Cada hijo agrega otro porcentaje según su edad.</p>
+      </div>
+      <div style="background:var(--gris-fondo);border-left:4px solid var(--verde-cta);border-radius:0 10px 10px 0;padding:1.25rem 1.5rem;">
+        <h3 style="font-size:1rem;font-weight:700;color:var(--azul-primario);margin-bottom:0.4rem;">3. Clínica preferente</h3>
+        <p style="color:var(--gris-texto);font-size:0.9rem;line-height:1.65;">Los planes con cobertura en Clínica Alemana o Clínica Las Condes son más caros (desde 1,45 UF/mes) que los sin preferencia de clínica (desde 0,80 UF/mes).</p>
+      </div>
+      <div style="background:var(--gris-fondo);border-left:4px solid var(--verde-cta);border-radius:0 10px 10px 0;padding:1.25rem 1.5rem;">
+        <h3 style="font-size:1rem;font-weight:700;color:var(--azul-primario);margin-bottom:0.4rem;">4. Nivel de cobertura</h3>
+        <p style="color:var(--gris-texto);font-size:0.9rem;line-height:1.65;">Mayor cobertura (más % de bonificación en consultas, exámenes y hospitalizaciones) implica un precio base más alto. Los planes económicos cubren lo esencial a menor costo.</p>
+      </div>
+    </div>
+
+    <h2 style="font-size:1.4rem;font-weight:700;color:var(--azul-primario);margin-bottom:1rem;">¿Cuánto es el 7% de mi sueldo para salud?</h2>
+    <p style="color:var(--gris-texto);line-height:1.75;margin-bottom:1.5rem;">
+      En Chile, tanto Fonasa como isapres se financian con el 7% de tu renta imponible. Si ganas $800.000, cotizas $56.000 al mes. La diferencia está en que en Fonasa ese dinero va al fondo común, mientras que en una isapre puede cubrir un plan específico con excedente o usarse como pago de copago.
+    </p>
+
+  </div>
+</section>
+
+<!-- CTA -->
+<section style="padding:4rem 0;background:var(--azul-profundo);" id="calcular">
+  <div class="container" style="max-width:500px;text-align:center;">
+    <h2 style="color:#fff;font-size:1.5rem;font-weight:700;margin-bottom:0.75rem;">Calcula tu precio real en 60 segundos</h2>
+    <p style="color:rgba(255,255,255,0.7);margin-bottom:1.5rem;">Ingresa tu edad, renta y cargas para ver exactamente cuánto pagarías en cada isapre.</p>
+    <a href="/" class="cta-primary" style="display:inline-block;text-decoration:none;padding:0.9rem 2rem;font-size:1rem;margin-bottom:1rem;">Ver mi precio personalizado →</a><br>
+    <a href="tel:+56964345927" style="color:rgba(255,255,255,0.6);font-size:0.9rem;">o llama al +56 9 6434 5927</a>
+  </div>
+</section>
+
+</main>
+
+<footer style="background:var(--azul-profundo);color:rgba(255,255,255,0.55);text-align:center;padding:1.75rem;font-size:0.82rem;border-top:1px solid rgba(255,255,255,0.08);">
+  <div style="margin-bottom:0.75rem;">
+    <a href="/" style="color:rgba(255,255,255,0.6);margin:0 0.75rem;text-decoration:none;">Inicio</a>
+    <a href="/comparar-isapres-chile/" style="color:rgba(255,255,255,0.6);margin:0 0.75rem;text-decoration:none;">Comparar</a>
+    <a href="/plan-isapre-economico/" style="color:rgba(255,255,255,0.6);margin:0 0.75rem;text-decoration:none;">Planes económicos</a>
+    <a href="/privacidad/" style="color:rgba(255,255,255,0.6);margin:0 0.75rem;text-decoration:none;">Privacidad</a>
+  </div>
+  © 2026 AsesoríasIsapres.com
+</footer>
+{% endblock %}
+
+{% block schema %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org", "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "¿Cuánto cuesta una isapre en Chile 2026?", "acceptedAnswer": { "@type": "Answer", "text": "Los planes de isapre en Chile 2026 van desde $31.000/mes (Nueva Masvida Plan Libre, 0,80 UF) hasta más de $70.000/mes para planes con cobertura en clínicas de alto nivel. El precio real depende de tu edad, cargas familiares y clínica preferente." } },
+    { "@type": "Question", "name": "¿Qué factores afectan el precio de una isapre?", "acceptedAnswer": { "@type": "Answer", "text": "Los principales factores son: edad (factor etario), cargas familiares (pareja e hijos), clínica preferente y nivel de cobertura. El factor etario puede multiplicar el precio base entre 1,1 y 2,0 veces según la edad." } },
+    { "@type": "Question", "name": "¿Cómo calculo cuánto pagaría en una isapre?", "acceptedAnswer": { "@type": "Answer", "text": "Puedes calcular tu precio real en 60 segundos en asesoriasisapres.com. Solo necesitas indicar tu renta aproximada, edad, cargas y clínica preferente." } }
+  ]
+}
+</script>
+{% endblock %}

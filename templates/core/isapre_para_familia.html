@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block meta_title %}Isapre para familia en Chile 2026: planes y precios con cargas{% endblock %}
+{% block meta_description %}Compara planes de isapre para familia en Chile 2026. Precios con pareja e hijos, coberturas pediátricas y qué isapre conviene para tu grupo familiar.{% endblock %}
+{% block canonical %}https://asesoriasisapres.com/isapre-para-familia/{% endblock %}
+
+{% block body %}
+<nav class="nav" role="navigation">
+  <div class="container">
+    <div class="nav__inner">
+      <a href="/" class="nav__logo"><img src="{% static 'img/logo-oscuro.svg' %}" alt="AsesoríasIsapres.com" width="185" height="42"></a>
+      <nav class="nav__links-desktop">
+        <a href="/">Inicio</a>
+        <a href="/comparar-isapres-chile/">Comparar isapres</a>
+        <a href="/cuanto-cuesta-isapre-chile/">Cuánto cuesta</a>
+        <a href="/isapre-o-fonasa/">Isapre o Fonasa</a>
+      </nav>
+      <a href="tel:+56964345927" class="nav__cta">+56 9 6434 5927</a>
+    </div>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="container">
+    <div style="max-width:700px;margin:0 auto;text-align:center;position:relative;z-index:1;">
+      <div class="hero__badge">Planes para familia 2026</div>
+      <h1 class="hero__headline">Isapre para familia en Chile: <em>planes y precios 2026</em></h1>
+      <p class="hero__sub">Cotizar una isapre familiar requiere considerar el factor etario de cada integrante y el tipo de cobertura que necesitas. Te explicamos cómo funciona y qué plan conviene.</p>
+      <a href="#cotizar" class="cta-primary" style="display:inline-block;text-decoration:none;padding:0.9rem 2rem;font-size:1rem;">Cotizar mi plan familiar →</a>
+    </div>
+  </div>
+</section>
+
+<main>
+
+<!-- Cómo funcionan las cargas -->
+<section style="padding:4rem 0;background:var(--gris-fondo);">
+  <div class="container" style="max-width:860px;">
+    <h2 style="text-align:center;font-size:1.5rem;font-weight:700;color:var(--azul-primario);margin-bottom:2rem;">¿Cómo se calcula el precio de una isapre familiar?</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.25rem;">
+      <div style="background:#fff;border:1px solid var(--gris-borde);border-radius:14px;padding:1.75rem;text-align:center;">
+        <div style="font-size:2.5rem;margin-bottom:0.75rem;">👤</div>
+        <h3 style="font-size:1rem;font-weight:700;color:var(--azul-primario);margin-bottom:0.5rem;">Solo (cotizante)</h3>
+        <p style="color:var(--gris-texto);font-size:0.88rem;line-height:1.6;">Precio base × factor etario del cotizante.</p>
+        <div style="margin-top:1rem;font-size:1.1rem;font-weight:700;color:var(--verde-oscuro);">Desde $31.000/mes</div>
+      </div>
+      <div style="background:#fff;border:1px solid var(--gris-borde);border-radius:14px;padding:1.75rem;text-align:center;">
+        <div style="font-size:2.5rem;margin-bottom:0.75rem;">👫</div>
+        <h3 style="font-size:1rem;font-weight:700;color:var(--azul-primario);margin-bottom:0.5rem;">Con pareja</h3>
+        <p style="color:var(--gris-texto);font-size:0.88rem;line-height:1.6;">Se suma el factor etario de la carga (pareja). Puede ser +40% a +80% sobre el precio base.</p>
+        <div style="margin-top:1rem;font-size:1.1rem;font-weight:700;color:var(--verde-oscuro);">Desde $55.000/mes</div>
+      </div>
+      <div style="background:#fff;border:1px solid var(--gris-borde);border-radius:14px;padding:1.75rem;text-align:center;">
+        <div style="font-size:2.5rem;margin-bottom:0.75rem;">👨‍👩‍👧</div>
+        <h3 style="font-size:1rem;font-weight:700;color:var(--azul-primario);margin-bottom:0.5rem;">Familia pequeña</h3>
+        <p style="color:var(--gris-texto);font-size:0.88rem;line-height:1.6;">Cotizante + pareja + 1 hijo. Cada carga agrega su propio factor etario.</p>
+        <div style="margin-top:1rem;font-size:1.1rem;font-weight:700;color:var(--verde-oscuro);">Desde $75.000/mes</div>
+      </div>
+      <div style="background:#fff;border:1px solid var(--gris-borde);border-radius:14px;padding:1.75rem;text-align:center;">
+        <div style="font-size:2.5rem;margin-bottom:0.75rem;">👨‍👩‍👧‍👦</div>
+        <h3 style="font-size:1rem;font-weight:700;color:var(--azul-primario);margin-bottom:0.5rem;">Familia grande</h3>
+        <p style="color:var(--gris-texto);font-size:0.88rem;line-height:1.6;">Cotizante + pareja + 2 o más hijos. Los hijos menores tienen factor etario bajo.</p>
+        <div style="margin-top:1rem;font-size:1.1rem;font-weight:700;color:var(--verde-oscuro);">Desde $95.000/mes</div>
+      </div>
+    </div>
+    <p style="text-align:center;font-size:0.78rem;color:var(--gris-texto);margin-top:1.25rem;">* Precios referenciales 2026 para familia de 30-35 años con plan básico sin clínica preferente.</p>
+  </div>
+</section>
+
+<!-- Contenido -->
+<section style="padding:4rem 0;">
+  <div class="container" style="max-width:760px;">
+
+    <h2 style="font-size:1.4rem;font-weight:700;color:var(--azul-primario);margin-bottom:1rem;">¿Qué conviene: un plan por familia o planes separados?</h2>
+    <p style="color:var(--gris-texto);line-height:1.75;margin-bottom:1.5rem;">
+      En Chile, la cotización de salud es individual: cada trabajador cotiza el 7% de su sueldo. Si ambos trabajan, cada uno tiene su propio plan. Los hijos se cargan al plan del padre o madre. Lo más eficiente es que el hijo se cargue al progenitor con mayor renta y plan con mejor cobertura pediátrica.
+    </p>
+
+    <h2 style="font-size:1.4rem;font-weight:700;color:var(--azul-primario);margin-bottom:1rem;">¿Qué cubre una isapre para niños?</h2>
+    <p style="color:var(--gris-texto);line-height:1.75;margin-bottom:1.5rem;">
+      Las isapres cubren controles de niño sano, vacunas del GES, hospitalizaciones pediátricas y urgencias. El porcentaje de cobertura varía por plan: algunos cubren el 80% de las consultas, otros el 60%. El GES/AUGE garantiza cobertura de las principales enfermedades infantiles en todas las isapres por igual.
+    </p>
+
+    <h2 style="font-size:1.4rem;font-weight:700;color:var(--azul-primario);margin-bottom:1rem;">¿Se puede agregar a la pareja si trabaja?</h2>
+    <p style="color:var(--gris-texto);line-height:1.75;margin-bottom:0;">
+      Si tu pareja trabaja y cotiza independientemente, no puede ser carga tuya. Solo puede ser carga si es una persona sin ingresos propios o con ingresos muy bajos. Los hijos en cambio siempre pueden ser cargas del padre o la madre que elija, independiente de si el otro trabaja o no.
+    </p>
+  </div>
+</section>
+
+<!-- Planes recomendados -->
+<section style="padding:3rem 0;background:var(--gris-fondo);">
+  <div class="container" style="max-width:820px;">
+    <h2 style="text-align:center;font-size:1.4rem;font-weight:700;color:var(--azul-primario);margin-bottom:0.5rem;">Planes recomendados para familias</h2>
+    <p style="text-align:center;color:var(--gris-texto);margin-bottom:1.5rem;font-size:0.9rem;">Precios base por cotizante solo. El asesor calcula el precio exacto con tus cargas.</p>
+    <div style="overflow-x:auto;">
+      <table style="width:100%;border-collapse:collapse;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 4px 24px rgba(4,44,83,0.08);">
+        <thead>
+          <tr style="background:var(--azul-profundo);color:#fff;">
+            <th style="padding:0.9rem 1.25rem;text-align:left;">Isapre</th>
+            <th style="padding:0.9rem 1.25rem;text-align:left;">Plan</th>
+            <th style="padding:0.9rem 1.25rem;text-align:right;">UF/mes</th>
+            <th style="padding:0.9rem 1.25rem;text-align:right;">CLP base</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in planes %}
+          <tr style="border-bottom:1px solid var(--gris-borde);">
+            <td style="padding:0.85rem 1.25rem;"><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:{{ p.dot }};margin-right:0.6rem;vertical-align:middle;"></span><strong style="color:var(--azul-primario);">{{ p.isapre }}</strong></td>
+            <td style="padding:0.85rem 1.25rem;color:var(--gris-texto);font-size:0.88rem;">{{ p.plan }}</td>
+            <td style="padding:0.85rem 1.25rem;text-align:right;font-weight:600;color:var(--azul-primario);">{{ p.precio_uf }} UF</td>
+            <td style="padding:0.85rem 1.25rem;text-align:right;font-weight:700;color:var(--verde-oscuro);">${{ p.clp|floatformat:0 }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section style="padding:4rem 0;background:var(--azul-profundo);" id="cotizar">
+  <div class="container" style="max-width:500px;text-align:center;">
+    <h2 style="color:#fff;font-size:1.5rem;font-weight:700;margin-bottom:0.75rem;">Cotiza el plan ideal para tu familia</h2>
+    <p style="color:rgba(255,255,255,0.7);margin-bottom:1.5rem;">Un asesor calcula el precio exacto con tus cargas y te recomienda la isapre que más conviene para tu grupo familiar.</p>
+    <a href="/" class="cta-primary" style="display:inline-block;text-decoration:none;padding:0.9rem 2rem;font-size:1rem;margin-bottom:1rem;">Cotizar plan familiar gratis →</a><br>
+    <a href="tel:+56964345927" style="color:rgba(255,255,255,0.6);font-size:0.9rem;">o llama al +56 9 6434 5927</a>
+  </div>
+</section>
+
+</main>
+
+<footer style="background:var(--azul-profundo);color:rgba(255,255,255,0.55);text-align:center;padding:1.75rem;font-size:0.82rem;border-top:1px solid rgba(255,255,255,0.08);">
+  <div style="margin-bottom:0.75rem;">
+    <a href="/" style="color:rgba(255,255,255,0.6);margin:0 0.75rem;text-decoration:none;">Inicio</a>
+    <a href="/comparar-isapres-chile/" style="color:rgba(255,255,255,0.6);margin:0 0.75rem;text-decoration:none;">Comparar</a>
+    <a href="/privacidad/" style="color:rgba(255,255,255,0.6);margin:0 0.75rem;text-decoration:none;">Privacidad</a>
+  </div>
+  © 2026 AsesoríasIsapres.com
+</footer>
+{% endblock %}
+
+{% block schema %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org", "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "¿Cuánto cuesta una isapre para familia en Chile 2026?", "acceptedAnswer": { "@type": "Answer", "text": "Una isapre para cotizante solo parte desde $31.000/mes. Con pareja desde $55.000/mes y con familia pequeña (cotizante + pareja + 1 hijo) desde $75.000/mes aproximadamente. El precio exacto depende de la edad de cada integrante." } },
+    { "@type": "Question", "name": "¿Puedo agregar a mis hijos como cargas en la isapre?", "acceptedAnswer": { "@type": "Answer", "text": "Sí. Los hijos pueden ser cargas del padre o la madre, independientemente de si el otro progenitor trabaja. Cada hijo agrega su propio factor etario al precio del plan." } },
+    { "@type": "Question", "name": "¿Qué isapre conviene para familias con niños?", "acceptedAnswer": { "@type": "Answer", "text": "Depende de la clínica preferente y el presupuesto. Para familias que buscan atención pediátrica en Clínica Dávila, Nueva Masvida y Consalud tienen buenos planes desde 1,05 UF/mes. Para Clínica Alemana, Cruz Blanca y Colmena son las opciones principales." } }
+  ]
+}
+</script>
+{% endblock %}
