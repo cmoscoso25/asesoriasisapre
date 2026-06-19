@@ -6,12 +6,19 @@ load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-dev-key-change-in-prod')
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
+
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-dev-key-local-only' if DEBUG else '')
+if not SECRET_KEY:
+    raise RuntimeError(
+        'La variable de entorno SECRET_KEY es obligatoria en producción. '
+        'Genera una con: python -c "import secrets; print(secrets.token_urlsafe(50))"'
+    )
 
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
 INSTALLED_APPS = [
+    'axes',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -32,9 +39,15 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'axes.middleware.AxesMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.cache.FetchFromCacheMiddleware',
+]
+
+AUTHENTICATION_BACKENDS = [
+    'axes.backends.AxesStandaloneBackend',
+    'django.contrib.auth.backends.ModelBackend',
 ]
 
 ROOT_URLCONF = 'asesoriasisapres.urls'
@@ -118,12 +131,15 @@ CACHE_MIDDLEWARE_SECONDS = 600
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-    }
+    },
+    'rate_limit': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'django_cache_ratelimit',
+    },
 }
 
 TAWKTO_ID = os.environ.get('TAWKTO_ID', '')
 
-# Logging a consola (visible en Render logs independiente de DEBUG)
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -157,9 +173,16 @@ LOGGING = {
     },
 }
 
+# django-axes: protección contra fuerza bruta en el admin
+AXES_ENABLED = True
+AXES_FAILURE_LIMIT = 5
+AXES_COOLOFF_TIME = 1  # horas de bloqueo tras 5 intentos fallidos
+AXES_RESET_ON_SUCCESS = True
+AXES_META_PRECEDENCE_ORDER = ['HTTP_X_FORWARDED_FOR', 'REMOTE_ADDR']
+
 # Content Security Policy
 CSP_DEFAULT_SRC     = ("'self'",)
-CSP_SCRIPT_SRC      = ("'self'", "'unsafe-inline'", "https://embed.tawk.to", "https://va.tawk.to")
+CSP_SCRIPT_SRC      = ("'self'", "https://embed.tawk.to", "https://va.tawk.to")
 CSP_STYLE_SRC       = ("'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://embed.tawk.to")
 CSP_FONT_SRC        = ("'self'", "https://fonts.gstatic.com", "https://embed.tawk.to")
 CSP_IMG_SRC         = ("'self'", "data:", "https:")
@@ -169,17 +192,14 @@ CSP_FRAME_ANCESTORS = ("'none'",)
 CSP_BASE_URI        = ("'self'",)
 CSP_FORM_ACTION     = ("'self'",)
 
-# Proxy SSL (Cloudflare → Render): Django lee X-Forwarded-Proto para saber que es HTTPS
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-# Dominos confiados para CSRF (requerido en Django 4.0+ detrás de proxy)
 CSRF_TRUSTED_ORIGINS = [
     'https://asesoriasisapres.com',
     'https://www.asesoriasisapres.com',
     'https://asesoriasisapre.onrender.com',
 ]
 
-# Seguridad en producción
 if not DEBUG:
     SECURE_SSL_REDIRECT = True
     SECURE_HSTS_SECONDS = 31536000
@@ -189,8 +209,6 @@ if not DEBUG:
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = 'Lax'
     CSRF_COOKIE_SECURE = True
-    # CSRF_COOKIE_HTTPONLY debe ser False (default) para que JS pueda leer
-    # el token vía document.cookie y enviarlo en X-CSRFToken (AJAX)
     CSRF_COOKIE_HTTPONLY = False
     CSRF_COOKIE_SAMESITE = 'Lax'
     SECURE_BROWSER_XSS_FILTER = True

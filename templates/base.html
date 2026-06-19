@@ -43,15 +43,11 @@
   <!-- Sitemap hint -->
   <link rel="sitemap" type="application/xml" href="/sitemap.xml">
 
-  <!-- Fuente Inter — no bloqueante -->
+  <!-- Fuente Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preload" as="style"
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-        onload="this.onload=null;this.rel='stylesheet'">
-  <noscript>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
-  </noscript>
+  <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
 
   <!-- CSS crítico -->
   {% load static %}
@@ -96,18 +92,6 @@
 
 {% block extra_scripts %}{% endblock %}
 
-{% if tawkto_id %}
-<script type="text/javascript">
-var Tawk_API=Tawk_API||{},Tawk_LoadStart=new Date();
-(function(){
-  var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-  s1.async=true;
-  s1.src='https://embed.tawk.to/{{ tawkto_id }}';
-  s1.charset='UTF-8';
-  s1.setAttribute('crossorigin','*');
-  s0.parentNode.insertBefore(s1,s0);
-})();
-</script>
-{% endif %}
+{% if tawkto_id %}<div id="tawkto-cfg" data-id="{{ tawkto_id }}" hidden></div>{% endif %}
 </body>
 </html>

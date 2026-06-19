@@ -69,10 +69,6 @@
 {% endblock %}
 
 {% block extra_scripts %}
-<script>
-  // Evento conversión Google Analytics
-  if (window.dataLayer) {
-    window.dataLayer.push({ event: 'lead_gracias_page' });
-  }
-</script>
+{% load static %}
+<script src="{% static 'js/gracias.js' %}" defer></script>
 {% endblock %}

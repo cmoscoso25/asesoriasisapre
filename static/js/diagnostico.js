@@ -37,85 +37,9 @@
     renderPaso();
   }
 
-  // ── Constantes Chile 2026 ──
+  // ── Constantes Chile 2026 (usadas por la calculadora de sueldo en landing) ──
   const UF = 39300;
   const TOPE_RENTA = Math.round(81.6 * UF);
-
-  function factorCargas(cargas) {
-    if (cargas === 'pareja')         return 1.00;
-    if (cargas === 'familia-chica')  return 1.00 + 0.49;
-    if (cargas === 'familia-grande') return 1.00 + 0.49 * 2.5;
-    return 0;
-  }
-
-  const PLANES_DB = {
-    'sin-preferencia': [
-      { isapre: 'Nueva Masvida', plan: 'Plan Libre',               precio_uf: 0.80, dot: '#F59E0B' },
-      { isapre: 'Esencial',      plan: 'Plan Básico',               precio_uf: 0.90, dot: '#EF4444' },
-      { isapre: 'Salud Conecta', plan: 'Clásico',                   precio_uf: 0.94, dot: '#6B7280' },
-      { isapre: 'Consalud',      plan: 'Activo',                    precio_uf: 1.10, dot: '#7C3AED' },
-      { isapre: 'Colmena',       plan: 'Star Plus',                 precio_uf: 1.15, dot: '#1D9E75' },
-      { isapre: 'Cruz Blanca',   plan: 'Total Salud 60',            precio_uf: 1.30, dot: '#185FA5' },
-      { isapre: 'Banmédica',     plan: 'Salud Clásico Gold Lite',   precio_uf: 1.70, dot: '#0C447C' },
-      { isapre: 'Banmédica',     plan: 'Signo VidaIntegra',         precio_uf: 1.80, dot: '#0C447C' },
-    ],
-    'alemana': [
-      { isapre: 'Cruz Blanca',   plan: 'Preferencia A1',              precio_uf: 1.45, dot: '#185FA5' },
-      { isapre: 'Colmena',       plan: 'Elite Clínica Alemana',       precio_uf: 1.60, dot: '#1D9E75' },
-      { isapre: 'Banmédica',     plan: 'Lite Ultra Clínica Alemana',  precio_uf: 1.70, dot: '#0C447C' },
-      { isapre: 'Banmédica',     plan: 'Signo Preferente Alemana',    precio_uf: 2.20, dot: '#0C447C' },
-    ],
-    'las-condes': [
-      { isapre: 'Cruz Blanca',   plan: 'Total Salud Las Condes',        precio_uf: 1.55, dot: '#185FA5' },
-      { isapre: 'Colmena',       plan: 'Las Condes Premium',            precio_uf: 1.65, dot: '#1D9E75' },
-      { isapre: 'Banmédica',     plan: 'Lite Ultra Clínica Las Condes', precio_uf: 1.70, dot: '#0C447C' },
-      { isapre: 'Banmédica',     plan: 'Signo VidaIntegra LC',          precio_uf: 2.10, dot: '#0C447C' },
-    ],
-    'davila': [
-      { isapre: 'Nueva Masvida', plan: 'Premier Dávila',          precio_uf: 1.05, dot: '#F59E0B' },
-      { isapre: 'Consalud',      plan: 'Activo Dávila',           precio_uf: 1.10, dot: '#7C3AED' },
-      { isapre: 'Cruz Blanca',   plan: 'Dávila Preferente',       precio_uf: 1.30, dot: '#185FA5' },
-      { isapre: 'Banmédica',     plan: 'Salud Clásico Gold Lite', precio_uf: 1.70, dot: '#0C447C' },
-    ],
-  };
-
-  function calcularDiagnostico(renta, cargas, situacion, clinica, pago_actual) {
-    const rentaEf    = Math.min(renta, TOPE_RENTA);
-    const cotizacion = Math.round(rentaEf * 0.07);
-    const fCargas    = factorCargas(cargas);
-    const fTotal     = parseFloat((1.0 + fCargas).toFixed(2));
-
-    const planesBase = PLANES_DB[clinica] || PLANES_DB['sin-preferencia'];
-    const planes = planesBase.map(p => ({
-      ...p,
-      ufTotal:  parseFloat((p.precio_uf * fTotal).toFixed(2)),
-      clpTotal: Math.round(p.precio_uf * fTotal * UF / 1000) * 1000,
-    }));
-
-    const planMin   = planes[0];
-    const planMed   = planes[Math.min(1, planes.length - 1)];
-    const excedente = cotizacion - planMin.clpTotal;
-
-    let ahorroMin = 0, ahorroMax = 0;
-
-    if (pago_actual && (situacion === 'isapre-cara' || situacion === 'isapre-subio')) {
-      // Ahorro exacto basado en pago declarado
-      ahorroMin = Math.max(0, pago_actual - planMed.clpTotal);
-      ahorroMax = Math.max(0, pago_actual - planMin.clpTotal);
-    } else if (situacion === 'fonasa') {
-      ahorroMin = Math.max(0, Math.round(excedente * 0.5 / 1000) * 1000);
-      ahorroMax = Math.max(0, excedente);
-    } else if (situacion === 'isapre-cara' || situacion === 'isapre-subio') {
-      const estimadoActual = Math.round(planMin.clpTotal * 2.2 / 1000) * 1000;
-      ahorroMin = Math.max(0, estimadoActual - planMed.clpTotal);
-      ahorroMax = Math.max(0, estimadoActual - planMin.clpTotal);
-    } else {
-      ahorroMin = Math.max(0, Math.round(excedente * 0.3 / 1000) * 1000);
-      ahorroMax = Math.max(0, Math.round(excedente * 0.7 / 1000) * 1000);
-    }
-
-    return { cotizacion, planMin, planMed, excedente, planes, ahorroMin, ahorroMax, fTotal };
-  }
 
   function formatCLP(n) {
     return '$' + n.toLocaleString('es-CL');
@@ -456,46 +380,61 @@
     });
 
     document.getElementById('btn-back-region').addEventListener('click', goBack);
-    document.getElementById('btn-next-region').addEventListener('click', function () {
+    document.getElementById('btn-next-region').addEventListener('click', async function () {
       if (!state.region) return;
 
-      const diag = calcularDiagnostico(
-        state.renta, state.cargas, state.situacion, state.clinica, state.pago_actual
-      );
-      state.ahorro_min  = diag.ahorroMin;
-      state.ahorro_max  = diag.ahorroMax;
-      state.diagnostico = diag;
-      state.isapres     = diag.planes.slice(0, 3).map(p => p.isapre);
+      const btnR = document.getElementById('btn-next-region');
+      btnR.disabled = true;
+      btnR.textContent = 'Calculando...';
 
-      fetch('/leads/diagnostico/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken') },
-        body: JSON.stringify({
-          situacion:        state.situacion,
-          prevision_actual: state.prevision_actual,
-          pago_actual:      state.pago_actual,
-          renta:            state.renta,
-          cargas:           state.cargas,
-          clinica:          state.clinica,
-          preferencia:      state.preferencia,
-          region:           state.region,
-          ahorro_min:       diag.ahorroMin,
-          ahorro_max:       diag.ahorroMax,
-          isapres:          state.isapres,
-        }),
-      }).catch(() => {});
-
-      if (window.dataLayer) {
-        window.dataLayer.push({
-          event: 'diagnostico_completado',
-          situacion: state.situacion,
-          renta_rango: state.renta < 800000 ? 'bajo' : state.renta < 1500000 ? 'medio' : 'alto',
-          tiene_clinica_pref: state.clinica !== 'sin-preferencia',
+      try {
+        const res = await fetch('/leads/calcular/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken') },
+          body: JSON.stringify({
+            situacion:        state.situacion,
+            prevision_actual: state.prevision_actual,
+            pago_actual:      state.pago_actual,
+            renta:            state.renta,
+            cargas:           state.cargas,
+            clinica:          state.clinica,
+            preferencia:      state.preferencia,
+            region:           state.region,
+          }),
         });
-      }
+        const json = await res.json();
+        if (!json.success) throw new Error('server_error');
 
-      state.currentStep = getSteps().length;
-      renderPaso();
+        const diag    = json.resultado;
+        state.ahorro_min  = diag.ahorroMin;
+        state.ahorro_max  = diag.ahorroMax;
+        state.diagnostico = diag;
+        state.isapres     = diag.planes.slice(0, 3).map(p => p.isapre);
+
+        if (window.dataLayer) {
+          window.dataLayer.push({
+            event: 'diagnostico_completado',
+            situacion: state.situacion,
+            renta_rango: state.renta < 800000 ? 'bajo' : state.renta < 1500000 ? 'medio' : 'alto',
+            tiene_clinica_pref: state.clinica !== 'sin-preferencia',
+          });
+        }
+
+        state.currentStep = getSteps().length;
+        renderPaso();
+
+      } catch (_) {
+        btnR.disabled = false;
+        btnR.textContent = 'Ver mi diagnóstico →';
+        const nav = document.querySelector('.calc-nav');
+        if (nav && !nav.querySelector('.calc-err')) {
+          const err = document.createElement('p');
+          err.className = 'calc-err';
+          err.style.cssText = 'color:#EF4444;font-size:0.82rem;margin-top:0.5rem;text-align:center;';
+          err.textContent = 'Error al calcular. Intenta de nuevo.';
+          nav.before(err);
+        }
+      }
     });
   }
 
@@ -1047,6 +986,36 @@
     bar.style.transition = 'opacity 0.3s ease';
   }
 
+  // ── Cerrar barra de anuncio ──
+  function initAnnounceBar() {
+    const btn = document.getElementById('announce-bar-close');
+    if (!btn) return;
+    btn.addEventListener('click', function () {
+      const bar = document.getElementById('announce-bar');
+      if (bar) bar.style.display = 'none';
+    });
+  }
+
+  // ── Tawk.to — carga asíncrona desde atributo data ──
+  function initTawkto() {
+    const cfg = document.getElementById('tawkto-cfg');
+    if (!cfg) return;
+    const id = cfg.dataset.id;
+    if (!id) return;
+    var Tawk_API = window.Tawk_API || {};
+    window.Tawk_API = Tawk_API;
+    window.Tawk_LoadStart = new Date();
+    (function () {
+      var s1 = document.createElement('script');
+      var s0 = document.getElementsByTagName('script')[0];
+      s1.async = true;
+      s1.src = 'https://embed.tawk.to/' + id;
+      s1.charset = 'UTF-8';
+      s1.setAttribute('crossorigin', '*');
+      s0.parentNode.insertBefore(s1, s0);
+    })();
+  }
+
   // ── Init ──
   document.addEventListener('DOMContentLoaded', function () {
     renderPaso();
@@ -1059,5 +1028,7 @@
     initCounters();
     initCalcSueldo();
     initSocialProof();
+    initAnnounceBar();
+    initTawkto();
   });
 })();

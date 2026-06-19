@@ -3,6 +3,7 @@ set -o errexit
 pip install -r requirements.txt
 python manage.py collectstatic --no-input
 python manage.py migrate
+python manage.py createcachetable django_cache_ratelimit || true
 
 # Crear superusuario si las variables están definidas
 if [ -n "$DJANGO_SUPERUSER_USERNAME" ]; then
