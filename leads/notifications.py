@@ -19,13 +19,26 @@ def _fila(label, valor, bold=False, color=None):
 
 
 def notificar_asesor(lead):
+    import traceback
+    try:
+        _enviar_notificacion(lead)
+    except Exception:
+        logger.error(
+            "Error inesperado en notificar_asesor lead #%s:\n%s",
+            getattr(lead, 'id', '?'),
+            traceback.format_exc(),
+        )
+
+
+def _enviar_notificacion(lead):
     api_key = os.environ.get('RESEND_API_KEY', '')
     if not api_key:
-        logger.warning(f"RESEND_API_KEY no configurada. Lead #{lead.id} no notificado por email.")
+        logger.warning("RESEND_API_KEY no configurada. Lead #%s no notificado.", lead.id)
         return
 
     emails_raw = os.environ.get('ASESOR_EMAILS', 'contacto@asesoriasisapres.com')
     destinatarios = [e.strip() for e in emails_raw.split(',') if e.strip()]
+    logger.info("Preparando email lead #%s -> %s", lead.id, destinatarios)
 
     renta_fmt = f"${lead.renta:,}".replace(',', '.') if lead.renta else "No indicada"
     pago_fmt = f"${lead.pago_actual:,}".replace(',', '.') + "/mes" if lead.pago_actual else "—"
@@ -38,15 +51,18 @@ def notificar_asesor(lead):
     clinica_txt = lead.get_clinica_preferente_display() if lead.clinica_preferente else "—"
     situacion_txt = lead.get_situacion_display() if lead.situacion else "—"
 
+    nombre_safe = (lead.nombre or '').replace(' ', '+')
     wa_link = (
         f"https://wa.me/569{lead.telefono}"
-        f"?text=Hola+{lead.nombre.replace(' ', '+')}%2C+soy+asesor+de"
+        f"?text=Hola+{nombre_safe}%2C+soy+asesor+de"
         f"+Asesor%C3%ADasIsapres.com+y+quiero+ayudarte."
     )
 
+    fecha_txt = lead.creado.strftime('%d/%m/%Y %H:%M') if lead.creado else "—"
+
     filas_html = (
         _fila("Nombre", lead.nombre, bold=True) +
-        _fila("RUT", f'<strong>{lead.rut}</strong> <span style="color:#1D9E75;font-size:12px;">&#10003; Verificado</span>') +
+        _fila("RUT", f'{lead.rut} <span style="color:#1D9E75;font-size:12px;">&#10003; Verificado</span>') +
         _fila("Celular / WhatsApp",
               f'<a href="{wa_link}" style="color:#0C447C;">'
               f'+569 {lead.telefono}</a>'
@@ -63,7 +79,7 @@ def notificar_asesor(lead):
         _fila("Clínica preferente", clinica_txt) +
         _fila("Ahorro estimado", ahorro_txt, bold=True, color="#1D9E75") +
         _fila("Origen", f"{lead.utm_source or 'Directo'} / {lead.utm_medium or '—'}") +
-        _fila("Fecha/hora", lead.creado.strftime('%d/%m/%Y %H:%M'))
+        _fila("Fecha/hora", fecha_txt)
     )
 
     html = f"""
@@ -73,7 +89,7 @@ def notificar_asesor(lead):
           &#128276; Nuevo Lead &mdash; asesoriasisapres.com
         </h2>
         <p style="color:#93C5FD;margin:4px 0 0;font-size:13px;">
-          Lead #{lead.id} &bull; {lead.creado.strftime('%d/%m/%Y %H:%M')}
+          Lead #{lead.id} &bull; {fecha_txt}
         </p>
       </div>
       <div style="background:#f7f8fa;padding:24px;border-radius:0 0 12px 12px;
@@ -110,8 +126,8 @@ def notificar_asesor(lead):
     }
 
     try:
-        r = requests.post("https://api.resend.com/emails", json=payload, headers=headers, timeout=5)
+        r = requests.post("https://api.resend.com/emails", json=payload, headers=headers, timeout=8)
         r.raise_for_status()
-        logger.info(f"Lead #{lead.id} notificado a: {destinatarios}")
+        logger.info("Lead #%s notificado OK (status %s)", lead.id, r.status_code)
     except Exception as e:
-        logger.error(f"Error enviando email para lead #{lead.id}: {e}")
+        logger.error("Error Resend para lead #%s: %s", lead.id, e)
