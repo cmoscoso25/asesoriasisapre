@@ -87,7 +87,42 @@
 <!-- JS -->
 <script src="{% static 'js/diagnostico.js' %}" defer></script>
 
-<!-- Schema.org -->
+<!-- Schema.org global -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "AsesoríasIsapres.com",
+  "url": "https://asesoriasisapres.com",
+  "description": "Asesoría gratuita para cotizar y comparar isapres en Chile.",
+  "inLanguage": "es-CL",
+  "publisher": {
+    "@type": "Organization",
+    "name": "AsesoríasIsapres.com",
+    "url": "https://asesoriasisapres.com",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://asesoriasisapres.com/static/img/logo-oscuro.svg"
+    },
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "telephone": "+56964345927",
+      "contactType": "customer service",
+      "areaServed": "CL",
+      "availableLanguage": "Spanish"
+    }
+  },
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": {
+      "@type": "EntryPoint",
+      "urlTemplate": "https://asesoriasisapres.com/?q={search_term_string}"
+    },
+    "query-input": "required name=search_term_string"
+  }
+}
+</script>
+
 {% block schema %}{% endblock %}
 
 {% block extra_scripts %}{% endblock %}
