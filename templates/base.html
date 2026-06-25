@@ -32,8 +32,8 @@
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:site" content="@asesoriasisapres">
-  <meta name="twitter:title" content="Cotiza tu Isapre Gratis en Chile — Asesoría Personalizada">
-  <meta name="twitter:description" content="Diagnóstico en 60 segundos. Compara todas las isapres y ahorra.">
+  <meta name="twitter:title" content="{% block twitter_title %}Cotizar Isapre Gratis en Chile 2026 | AsesoríasIsapres.com{% endblock %}">
+  <meta name="twitter:description" content="{% block twitter_desc %}Diagnóstico en 60 segundos. Compara todas las isapres de Chile y ahorra hasta $50.000/mes.{% endblock %}">
   <meta name="twitter:image" content="{{ og_image }}">
 
   <!-- Favicon -->
@@ -87,7 +87,31 @@
 <!-- JS -->
 <script src="{% static 'js/diagnostico.js' %}" defer></script>
 
-<!-- Schema.org global -->
+<!-- Schema.org global: LocalBusiness (todas las páginas) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "name": "AsesoríasIsapres.com",
+  "url": "https://asesoriasisapres.com",
+  "logo": "https://asesoriasisapres.com/static/img/logo-oscuro.svg",
+  "telephone": "+56964345927",
+  "address": {
+    "@type": "PostalAddress",
+    "addressCountry": "CL",
+    "addressRegion": "Arica y Parinacota"
+  },
+  "sameAs": [
+    "https://www.instagram.com/ase_isapres",
+    "https://www.facebook.com/profile.php?id=100093992800980"
+  ],
+  "areaServed": { "@type": "Country", "name": "Chile" },
+  "description": "Asesoría gratuita para cotizar y comparar planes de isapre en Chile. Acreditados por la Superintendencia de Salud.",
+  "priceRange": "Gratis"
+}
+</script>
+
+<!-- Schema.org global: WebSite -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
