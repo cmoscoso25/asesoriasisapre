@@ -1,0 +1,98 @@
+{% extends "gestion/base_gestion.html" %}
+{% block title %}Outlook{% endblock %}
+{% block nav_outlook %}active{% endblock %}
+{% block breadcrumb %}Integración Outlook{% endblock %}
+
+{% block content %}
+<div class="g-page-header">
+  <h1 class="g-page-title">Integración con Outlook Calendar</h1>
+</div>
+
+<div class="g-form-container">
+
+  {% if conexion and conexion.conectado %}
+  <!-- CONECTADO -->
+  <div class="g-card">
+    <div class="g-card__header">
+      <h2 class="g-card__title">✅ Cuenta conectada</h2>
+    </div>
+    <dl class="g-dl">
+      <dt>Cuenta Microsoft</dt>
+      <dd>{{ conexion.nombre_cuenta }} ({{ conexion.email }})</dd>
+      <dt>Estado</dt>
+      <dd><span class="g-badge g-badge--success">Activo</span></dd>
+      <dt>Última sincronización</dt>
+      <dd>{{ conexion.actualizado|date:"d/m/Y H:i" }}</dd>
+      <dt>Token expira</dt>
+      <dd>{{ conexion.token_expires_at|date:"d/m/Y H:i" }}</dd>
+    </dl>
+    <div class="g-card__footer">
+      <form method="post" action="{% url 'gestion:outlook_desconectar' %}"
+            onsubmit="return confirm('¿Desconectar Outlook? Las reuniones ya sincronizadas quedan en tu calendario.')">
+        {% csrf_token %}
+        <button type="submit" class="g-btn g-btn--danger g-btn--sm">Desconectar cuenta</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="g-card">
+    <div class="g-card__header"><h2 class="g-card__title">Cómo funciona</h2></div>
+    <ul class="g-info-list">
+      <li>Al agendar una reunión en el CRM, se crea automáticamente un evento en tu Outlook Calendar.</li>
+      <li>Si editas la reunión, el evento en Outlook se actualiza.</li>
+      <li>Los recordatorios configurados (15 min, 30 min, etc.) se sincronizan con Outlook.</li>
+      <li>La sincronización es unidireccional: CRM → Outlook.</li>
+    </ul>
+  </div>
+
+  {% elif not outlook_configurado %}
+  <!-- NO CONFIGURADO -->
+  <div class="g-card">
+    <div class="g-card__header">
+      <h2 class="g-card__title">⚙️ Outlook no configurado</h2>
+    </div>
+    <p class="g-card__body">
+      Para usar la integración con Outlook Calendar necesitas registrar una aplicación en
+      <strong>Microsoft Azure Active Directory</strong> y configurar las variables de entorno en Render.
+    </p>
+    <div class="g-alert g-alert--warning">
+      <strong>Variables requeridas en Render:</strong><br>
+      <code>MICROSOFT_CLIENT_ID</code>, <code>MICROSOFT_CLIENT_SECRET</code>,
+      <code>MICROSOFT_TENANT_ID</code>, <code>MICROSOFT_REDIRECT_URI</code>
+    </div>
+    <div class="g-card__footer">
+      <a href="#" class="g-btn g-btn--secondary" onclick="alert('Ver docs/CONFIGURACION_OUTLOOK.md en el repositorio.')">
+        Ver guía de configuración
+      </a>
+    </div>
+  </div>
+
+  {% else %}
+  <!-- CONFIGURADO PERO NO CONECTADO -->
+  <div class="g-card">
+    <div class="g-card__header">
+      <h2 class="g-card__title">📧 Conectar con Outlook</h2>
+    </div>
+    <p class="g-card__body">
+      Conecta tu cuenta de Microsoft para sincronizar las reuniones del CRM con tu Outlook Calendar.
+      Se te pedirá autorizar el acceso a tu calendario.
+    </p>
+    <div class="g-card__footer">
+      <a href="{% url 'gestion:outlook_conectar' %}" class="g-btn g-btn--primary">
+        Conectar con Microsoft
+      </a>
+    </div>
+  </div>
+
+  <div class="g-card">
+    <div class="g-card__header"><h2 class="g-card__title">¿Qué permisos solicita?</h2></div>
+    <ul class="g-info-list">
+      <li><strong>Calendars.ReadWrite</strong> — Crear y editar eventos en tu calendario.</li>
+      <li><strong>User.Read</strong> — Leer tu nombre y email (para mostrarlos aquí).</li>
+      <li><strong>offline_access</strong> — Mantener la sesión activa sin pedir autorización cada hora.</li>
+    </ul>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Panel de Gestión{% endblock %} — AsesoríasIsapres</title>
+  <meta name="robots" content="noindex, nofollow">
+
+  <link rel="icon" type="image/svg+xml" href="/static/img/favicon.svg">
+
+  <!-- Inter font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/main.css' %}">
+  <link rel="stylesheet" href="{% static 'css/gestion.css' %}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body class="g-body">
+
+<!-- Sidebar -->
+<nav class="g-sidebar" id="g-sidebar">
+  <div class="g-sidebar__header">
+    <a href="{% url 'gestion:dashboard' %}" class="g-sidebar__logo">
+      <img src="{% static 'img/logo-oscuro.svg' %}" alt="AsesoríasIsapres" onerror="this.style.display='none'">
+      <span class="g-sidebar__logo-text">Gestión</span>
+    </a>
+    <button class="g-sidebar__toggle" id="sidebar-close" aria-label="Cerrar menú">✕</button>
+  </div>
+
+  <ul class="g-sidebar__nav">
+    <li>
+      <a href="{% url 'gestion:dashboard' %}"
+         class="g-sidebar__link {% block nav_dashboard %}{% endblock %}">
+        <span class="g-sidebar__icon">📊</span>
+        Dashboard
+      </a>
+    </li>
+    <li>
+      <a href="{% url 'gestion:prospecto_lista' %}"
+         class="g-sidebar__link {% block nav_prospectos %}{% endblock %}">
+        <span class="g-sidebar__icon">👥</span>
+        Prospectos
+        {% if tareas_vencidas_count %}
+          <span class="g-badge g-badge--danger">{{ tareas_vencidas_count }}</span>
+        {% endif %}
+      </a>
+    </li>
+    <li>
+      <a href="{% url 'gestion:reunion_lista' %}"
+         class="g-sidebar__link {% block nav_reuniones %}{% endblock %}">
+        <span class="g-sidebar__icon">🤝</span>
+        Reuniones
+        {% if reuniones_hoy_count %}
+          <span class="g-badge g-badge--info">{{ reuniones_hoy_count }}</span>
+        {% endif %}
+      </a>
+    </li>
+    <li>
+      <a href="{% url 'gestion:calendario' %}"
+         class="g-sidebar__link {% block nav_calendario %}{% endblock %}">
+        <span class="g-sidebar__icon">📅</span>
+        Calendario
+      </a>
+    </li>
+    <li>
+      <a href="{% url 'gestion:tarea_lista' %}"
+         class="g-sidebar__link {% block nav_tareas %}{% endblock %}">
+        <span class="g-sidebar__icon">✅</span>
+        Tareas
+      </a>
+    </li>
+    <li>
+      <a href="{% url 'gestion:outlook_estado' %}"
+         class="g-sidebar__link {% block nav_outlook %}{% endblock %}">
+        <span class="g-sidebar__icon">📧</span>
+        Outlook
+      </a>
+    </li>
+  </ul>
+
+  <div class="g-sidebar__footer">
+    <a href="/" target="_blank" class="g-sidebar__footer-link">← Sitio público</a>
+    <a href="{% url 'admin:logout' %}" class="g-sidebar__footer-link">Salir</a>
+  </div>
+</nav>
+
+<!-- Overlay móvil -->
+<div class="g-overlay" id="g-overlay"></div>
+
+<!-- Main -->
+<main class="g-main">
+  <!-- Top bar -->
+  <header class="g-topbar">
+    <button class="g-topbar__menu-btn" id="sidebar-open" aria-label="Abrir menú">☰</button>
+    <div class="g-topbar__breadcrumb">{% block breadcrumb %}{% endblock %}</div>
+    <div class="g-topbar__user">
+      <span class="g-topbar__username">{{ request.user.get_full_name|default:request.user.username }}</span>
+    </div>
+  </header>
+
+  <!-- Mensajes flash -->
+  {% if messages %}
+  <div class="g-messages">
+    {% for msg in messages %}
+    <div class="g-alert g-alert--{{ msg.tags|default:'info' }}">
+      <span>{{ msg }}</span>
+      <button onclick="this.parentElement.remove()" class="g-alert__close">✕</button>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- Contenido de la página -->
+  <div class="g-content">
+    {% block content %}{% endblock %}
+  </div>
+</main>
+
+<script src="{% static 'js/gestion.js' %}" defer></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

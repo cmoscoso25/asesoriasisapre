@@ -1,0 +1,184 @@
+{% extends "gestion/base_gestion.html" %}
+{% block title %}Calendario{% endblock %}
+{% block nav_calendario %}active{% endblock %}
+{% block breadcrumb %}Calendario{% endblock %}
+
+{% block content %}
+<div class="g-page-header">
+  <h1 class="g-page-title">Calendario de reuniones</h1>
+  <a href="{% url 'gestion:reunion_nueva' %}" class="g-btn g-btn--primary">+ Nueva reunión</a>
+</div>
+
+<div class="g-cal-wrap">
+  <!-- Controles del calendario -->
+  <div class="g-cal-header">
+    <button class="g-btn g-btn--ghost g-btn--sm" id="cal-prev">← Anterior</button>
+    <h2 class="g-cal-title" id="cal-title">Cargando…</h2>
+    <button class="g-btn g-btn--ghost g-btn--sm" id="cal-next">Siguiente →</button>
+    <button class="g-btn g-btn--secondary g-btn--sm" id="cal-today">Hoy</button>
+  </div>
+
+  <!-- Grilla del calendario -->
+  <div class="g-cal-grid" id="cal-grid">
+    <div class="g-cal-weekdays">
+      <div>Lun</div><div>Mar</div><div>Mié</div>
+      <div>Jue</div><div>Vie</div><div>Sáb</div><div>Dom</div>
+    </div>
+    <div class="g-cal-days" id="cal-days">
+      <!-- JS popula aquí -->
+    </div>
+  </div>
+
+  <!-- Panel de eventos del día seleccionado -->
+  <div class="g-cal-panel" id="cal-panel" style="display:none">
+    <div class="g-cal-panel__header">
+      <h3 id="cal-panel-title">Eventos</h3>
+      <button onclick="document.getElementById('cal-panel').style.display='none'" class="g-btn g-btn--ghost g-btn--sm">✕</button>
+    </div>
+    <ul id="cal-panel-list" class="g-list"></ul>
+    <div class="g-cal-panel__actions">
+      <a id="cal-panel-new" href="{% url 'gestion:reunion_nueva' %}" class="g-btn g-btn--primary g-btn--sm">+ Agregar reunión</a>
+    </div>
+  </div>
+</div>
+
+<!-- Leyenda -->
+<div class="g-cal-legend">
+  <span><span class="g-cal-dot" style="background:#185FA5"></span> Agendada</span>
+  <span><span class="g-cal-dot" style="background:#1D9E75"></span> Confirmada</span>
+  <span><span class="g-cal-dot" style="background:#0F6E56"></span> Realizada</span>
+  <span><span class="g-cal-dot" style="background:#ef4444"></span> Cancelada</span>
+  <span><span class="g-cal-dot" style="background:#d97706"></span> Reprogramada</span>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+  const API_URL = '/gestion/calendario/eventos/';
+  let currentDate = new Date();
+  let allEvents = [];
+
+  function pad(n) { return String(n).padStart(2, '0'); }
+  function fmtDate(d) {
+    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  }
+  function mesNombre(m) {
+    return ['Enero','Febrero','Marzo','Abril','Mayo','Junio',
+            'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'][m];
+  }
+
+  async function cargarEventos(inicio, fin) {
+    const url = `${API_URL}?inicio=${inicio}&fin=${fin}`;
+    try {
+      const r = await fetch(url, {headers: {'X-Requested-With': 'XMLHttpRequest'}});
+      allEvents = await r.json();
+    } catch(e) { allEvents = []; }
+  }
+
+  function renderCalendario() {
+    const year  = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+
+    document.getElementById('cal-title').textContent = `${mesNombre(month)} ${year}`;
+
+    const primer = new Date(year, month, 1);
+    const ultimo = new Date(year, month + 1, 0);
+    const inicio = new Date(primer);
+    // Ajustar al lunes (0=Dom en JS, 1=Lun... convertir a lunes=0)
+    const dow = (primer.getDay() + 6) % 7;
+    inicio.setDate(inicio.getDate() - dow);
+
+    const fin = new Date(ultimo);
+    const dowFin = (ultimo.getDay() + 6) % 7;
+    fin.setDate(fin.getDate() + (6 - dowFin));
+
+    cargarEventos(fmtDate(inicio), fmtDate(fin)).then(() => {
+      const container = document.getElementById('cal-days');
+      container.innerHTML = '';
+      const today = fmtDate(new Date());
+      let cur = new Date(inicio);
+
+      while (cur <= fin) {
+        const dateStr = fmtDate(cur);
+        const isToday = dateStr === today;
+        const isOtherMonth = cur.getMonth() !== month;
+        const dayEvents = allEvents.filter(e => e.start.startsWith(dateStr));
+
+        const cell = document.createElement('div');
+        cell.className = `g-cal-cell${isToday ? ' g-cal-cell--today' : ''}${isOtherMonth ? ' g-cal-cell--other' : ''}`;
+
+        const num = document.createElement('span');
+        num.className = 'g-cal-cell__num';
+        num.textContent = cur.getDate();
+        cell.appendChild(num);
+
+        if (dayEvents.length > 0) {
+          const dots = document.createElement('div');
+          dots.className = 'g-cal-cell__events';
+          dayEvents.slice(0, 3).forEach(ev => {
+            const dot = document.createElement('span');
+            dot.className = 'g-cal-dot g-cal-dot--sm';
+            dot.style.background = ev.color;
+            dot.title = ev.title;
+            dots.appendChild(dot);
+          });
+          if (dayEvents.length > 3) {
+            const more = document.createElement('span');
+            more.className = 'g-cal-more';
+            more.textContent = `+${dayEvents.length - 3}`;
+            dots.appendChild(more);
+          }
+          cell.appendChild(dots);
+          cell.style.cursor = 'pointer';
+          cell.addEventListener('click', () => mostrarPanel(dateStr, dayEvents));
+        }
+
+        container.appendChild(cell);
+        cur.setDate(cur.getDate() + 1);
+      }
+    });
+  }
+
+  function mostrarPanel(dateStr, events) {
+    const panel = document.getElementById('cal-panel');
+    const title = document.getElementById('cal-panel-title');
+    const list  = document.getElementById('cal-panel-list');
+    const [y, m, d] = dateStr.split('-');
+    title.textContent = `${Number(d)} de ${mesNombre(Number(m)-1)} ${y}`;
+    list.innerHTML = '';
+    events.forEach(ev => {
+      const hora = ev.start.split('T')[1]?.slice(0,5) || '';
+      const li = document.createElement('li');
+      li.className = 'g-list__item';
+      li.innerHTML = `
+        <div class="g-list__body">
+          <a href="${ev.url}">${ev.title}</a>
+          <small>${hora ? hora + ' · ' : ''}${ev.prospecto}</small>
+        </div>
+        <span class="g-badge" style="background:${ev.color}">${ev.estado}</span>
+      `;
+      list.appendChild(li);
+    });
+    const newUrl = new URL('/gestion/reuniones/nueva/', location.origin);
+    document.getElementById('cal-panel-new').href = newUrl.pathname;
+    panel.style.display = 'block';
+  }
+
+  document.getElementById('cal-prev').addEventListener('click', () => {
+    currentDate.setMonth(currentDate.getMonth() - 1);
+    renderCalendario();
+  });
+  document.getElementById('cal-next').addEventListener('click', () => {
+    currentDate.setMonth(currentDate.getMonth() + 1);
+    renderCalendario();
+  });
+  document.getElementById('cal-today').addEventListener('click', () => {
+    currentDate = new Date();
+    renderCalendario();
+  });
+
+  renderCalendario();
+})();
+</script>
+{% endblock %}

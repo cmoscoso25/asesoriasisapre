@@ -1,0 +1,86 @@
+{% extends "gestion/base_gestion.html" %}
+{% block title %}Reuniones{% endblock %}
+{% block nav_reuniones %}active{% endblock %}
+{% block breadcrumb %}Reuniones{% endblock %}
+
+{% block content %}
+<div class="g-page-header">
+  <h1 class="g-page-title">Reuniones</h1>
+  <div class="g-page-actions">
+    <a href="{% url 'gestion:calendario' %}" class="g-btn g-btn--secondary">Ver calendario</a>
+    <a href="{% url 'gestion:reunion_nueva' %}" class="g-btn g-btn--primary">+ Nueva reunión</a>
+  </div>
+</div>
+
+<form method="get" class="g-filters">
+  <input type="search" name="q" value="{{ q }}" placeholder="Buscar por título o prospecto…" class="g-input">
+  <select name="estado" class="g-select g-select--sm">
+    <option value="">Todos los estados</option>
+    {% for val, label in estado_choices %}
+    <option value="{{ val }}" {% if filtro_estado == val %}selected{% endif %}>{{ label }}</option>
+    {% endfor %}
+  </select>
+  <button type="submit" class="g-btn g-btn--secondary g-btn--sm">Filtrar</button>
+  {% if q or filtro_estado %}
+  <a href="{% url 'gestion:reunion_lista' %}" class="g-btn g-btn--ghost g-btn--sm">Limpiar</a>
+  {% endif %}
+</form>
+
+<div class="g-card g-card--table">
+  {% if page_obj %}
+  <table class="g-table">
+    <thead>
+      <tr>
+        <th>Reunión</th>
+        <th>Prospecto</th>
+        <th>Fecha y hora</th>
+        <th>Modalidad</th>
+        <th>Estado</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in page_obj %}
+      <tr>
+        <td><strong>{{ r.titulo }}</strong></td>
+        <td>
+          <a href="{% url 'gestion:prospecto_detalle' pk=r.prospecto.pk %}">{{ r.prospecto.nombre }}</a>
+        </td>
+        <td>{{ r.fecha|date:"d/m/Y" }} {{ r.hora_inicio|time:"H:i" }}</td>
+        <td>{{ r.get_modalidad_display }}</td>
+        <td><span class="g-badge" style="background:{{ r.get_estado_color }}">{{ r.get_estado_display }}</span></td>
+        <td class="g-table__actions">
+          <a href="{% url 'gestion:reunion_editar' pk=r.pk %}" class="g-btn g-btn--xs g-btn--ghost">✏️</a>
+          {% if r.estado != 'cancelada' %}
+          <form method="post" action="{% url 'gestion:reunion_cancelar' pk=r.pk %}" style="display:inline"
+                onsubmit="return confirm('¿Cancelar esta reunión?')">
+            {% csrf_token %}
+            <button type="submit" class="g-btn g-btn--xs g-btn--ghost" title="Cancelar">✕</button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {% if page_obj.has_other_pages %}
+  <div class="g-pagination">
+    {% if page_obj.has_previous %}
+    <a href="?page={{ page_obj.previous_page_number }}&q={{ q }}&estado={{ filtro_estado }}" class="g-btn g-btn--ghost g-btn--sm">← Anterior</a>
+    {% endif %}
+    <span class="g-pagination__info">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}&q={{ q }}&estado={{ filtro_estado }}" class="g-btn g-btn--ghost g-btn--sm">Siguiente →</a>
+    {% endif %}
+  </div>
+  {% endif %}
+  {% else %}
+  <div class="g-empty-state">
+    <div class="g-empty-state__icon">🤝</div>
+    <p>No hay reuniones registradas.</p>
+    <a href="{% url 'gestion:reunion_nueva' %}" class="g-btn g-btn--primary">Agendar primera reunión</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

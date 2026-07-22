@@ -1,0 +1,58 @@
+{% extends "gestion/base_gestion.html" %}
+{% block title %}{{ titulo }}{% endblock %}
+{% block nav_tareas %}active{% endblock %}
+{% block breadcrumb %}
+  <a href="{% url 'gestion:tarea_lista' %}">Tareas</a> › {{ titulo }}
+{% endblock %}
+
+{% block content %}
+<div class="g-page-header">
+  <h1 class="g-page-title">{{ titulo }}</h1>
+</div>
+
+<div class="g-form-container">
+  <form method="post" class="g-form" novalidate>
+    {% csrf_token %}
+    <div class="g-form-section">
+      <div class="g-form-grid">
+        <div class="g-form-row g-form-row--full">
+          <label class="g-label" for="{{ form.prospecto.id_for_label }}">Prospecto *</label>
+          {{ form.prospecto }}
+          {% if form.prospecto.errors %}<span class="g-error">{{ form.prospecto.errors.0 }}</span>{% endif %}
+        </div>
+        <div class="g-form-row g-form-row--full">
+          <label class="g-label" for="{{ form.titulo.id_for_label }}">Título de la tarea *</label>
+          {{ form.titulo }}
+          {% if form.titulo.errors %}<span class="g-error">{{ form.titulo.errors.0 }}</span>{% endif %}
+        </div>
+        <div class="g-form-row">
+          <label class="g-label" for="{{ form.tipo.id_for_label }}">Tipo</label>
+          {{ form.tipo }}
+        </div>
+        <div class="g-form-row">
+          <label class="g-label" for="{{ form.prioridad.id_for_label }}">Prioridad</label>
+          {{ form.prioridad }}
+        </div>
+        <div class="g-form-row">
+          <label class="g-label" for="{{ form.fecha.id_for_label }}">Fecha *</label>
+          {{ form.fecha }}
+        </div>
+        <div class="g-form-row">
+          <label class="g-label" for="{{ form.hora.id_for_label }}">Hora</label>
+          {{ form.hora }}
+        </div>
+        <div class="g-form-row g-form-row--full">
+          <label class="g-label" for="{{ form.descripcion.id_for_label }}">Descripción</label>
+          {{ form.descripcion }}
+        </div>
+      </div>
+    </div>
+    <div class="g-form-actions">
+      <button type="submit" class="g-btn g-btn--primary">
+        {% if tarea %}Guardar cambios{% else %}Crear tarea{% endif %}
+      </button>
+      <a href="{% url 'gestion:tarea_lista' %}" class="g-btn g-btn--ghost">Cancelar</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

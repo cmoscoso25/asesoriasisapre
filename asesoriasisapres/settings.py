@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'django.contrib.sitemaps',
     'core',
     'leads',
+    'gestion',
 ]
 
 MIDDLEWARE = [
@@ -140,6 +141,17 @@ CACHES = {
 
 TAWKTO_ID = os.environ.get('TAWKTO_ID', '')
 
+# Microsoft Graph / Outlook Calendar (opcional — solo para integración Outlook)
+MICROSOFT_CLIENT_ID     = os.environ.get('MICROSOFT_CLIENT_ID', '')
+MICROSOFT_CLIENT_SECRET = os.environ.get('MICROSOFT_CLIENT_SECRET', '')
+MICROSOFT_TENANT_ID     = os.environ.get('MICROSOFT_TENANT_ID', 'common')
+MICROSOFT_REDIRECT_URI  = os.environ.get(
+    'MICROSOFT_REDIRECT_URI',
+    'https://asesoriasisapres.com/gestion/outlook/callback/',
+)
+
+LOGIN_URL = '/gestion-interna/login/'
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -168,6 +180,11 @@ LOGGING = {
         'leads': {
             'handlers': ['console'],
             'level': 'DEBUG',
+            'propagate': False,
+        },
+        'gestion': {
+            'handlers': ['console'],
+            'level': 'INFO',
             'propagate': False,
         },
     },

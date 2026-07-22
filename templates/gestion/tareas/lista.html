@@ -1,0 +1,92 @@
+{% extends "gestion/base_gestion.html" %}
+{% block title %}Tareas{% endblock %}
+{% block nav_tareas %}active{% endblock %}
+{% block breadcrumb %}Tareas{% endblock %}
+
+{% block content %}
+<div class="g-page-header">
+  <h1 class="g-page-title">Tareas de seguimiento</h1>
+  <a href="{% url 'gestion:tarea_nueva' %}" class="g-btn g-btn--primary">+ Nueva tarea</a>
+</div>
+
+<!-- Vencidas -->
+{% if tareas_vencidas %}
+<div class="g-card">
+  <div class="g-card__header">
+    <h2 class="g-card__title g-text--danger">⚠️ Vencidas ({{ tareas_vencidas.count }})</h2>
+  </div>
+  <ul class="g-checklist">
+    {% for t in tareas_vencidas %}
+    <li class="g-checklist__item">
+      <form method="post" action="{% url 'gestion:tarea_completar' pk=t.pk %}">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.path }}">
+        <button type="submit" class="g-checklist__check" title="Completar">○</button>
+      </form>
+      <div class="g-checklist__text">
+        <a href="{% url 'gestion:prospecto_detalle' pk=t.prospecto.pk %}">{{ t.titulo }}</a>
+        <small>{{ t.prospecto.nombre }} · Venció {{ t.fecha|date:"d/m/Y" }}</small>
+      </div>
+      <span class="g-badge g-badge--{{ t.prioridad }}">{{ t.get_prioridad_display }}</span>
+      <a href="{% url 'gestion:tarea_editar' pk=t.pk %}" class="g-btn g-btn--xs g-btn--ghost">✏️</a>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
+
+<!-- Hoy -->
+<div class="g-card">
+  <div class="g-card__header">
+    <h2 class="g-card__title">📅 Para hoy ({{ tareas_hoy.count }})</h2>
+  </div>
+  {% if tareas_hoy %}
+  <ul class="g-checklist">
+    {% for t in tareas_hoy %}
+    <li class="g-checklist__item">
+      <form method="post" action="{% url 'gestion:tarea_completar' pk=t.pk %}">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.path }}">
+        <button type="submit" class="g-checklist__check" title="Completar">○</button>
+      </form>
+      <div class="g-checklist__text">
+        <a href="{% url 'gestion:prospecto_detalle' pk=t.prospecto.pk %}">{{ t.titulo }}</a>
+        <small>{{ t.prospecto.nombre }}{% if t.hora %} · {{ t.hora|time:"H:i" }}{% endif %} · {{ t.get_tipo_display }}</small>
+      </div>
+      <span class="g-badge g-badge--{{ t.prioridad }}">{{ t.get_prioridad_display }}</span>
+      <a href="{% url 'gestion:tarea_editar' pk=t.pk %}" class="g-btn g-btn--xs g-btn--ghost">✏️</a>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p class="g-empty">No hay tareas para hoy.</p>
+  {% endif %}
+</div>
+
+<!-- Próximos 7 días -->
+<div class="g-card">
+  <div class="g-card__header">
+    <h2 class="g-card__title">📆 Próximos 7 días ({{ tareas_proximas.count }})</h2>
+  </div>
+  {% if tareas_proximas %}
+  <ul class="g-checklist">
+    {% for t in tareas_proximas %}
+    <li class="g-checklist__item">
+      <form method="post" action="{% url 'gestion:tarea_completar' pk=t.pk %}">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.path }}">
+        <button type="submit" class="g-checklist__check" title="Completar">○</button>
+      </form>
+      <div class="g-checklist__text">
+        <a href="{% url 'gestion:prospecto_detalle' pk=t.prospecto.pk %}">{{ t.titulo }}</a>
+        <small>{{ t.prospecto.nombre }} · {{ t.fecha|date:"d/m/Y" }}{% if t.hora %} {{ t.hora|time:"H:i" }}{% endif %}</small>
+      </div>
+      <span class="g-badge g-badge--{{ t.prioridad }}">{{ t.get_prioridad_display }}</span>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p class="g-empty">No hay tareas pendientes en los próximos 7 días.</p>
+  {% endif %}
+</div>
+{% endblock %}

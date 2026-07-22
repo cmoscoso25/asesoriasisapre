@@ -1,0 +1,117 @@
+{% extends "gestion/base_gestion.html" %}
+{% block title %}Prospectos{% endblock %}
+{% block nav_prospectos %}active{% endblock %}
+{% block breadcrumb %}Prospectos{% endblock %}
+
+{% block content %}
+<div class="g-page-header">
+  <h1 class="g-page-title">Prospectos</h1>
+  <a href="{% url 'gestion:prospecto_nuevo' %}" class="g-btn g-btn--primary">+ Nuevo prospecto</a>
+</div>
+
+<!-- Filtros -->
+<form method="get" class="g-filters">
+  <div class="g-filters__search">
+    <input type="search" name="q" value="{{ q }}" placeholder="Buscar por nombre, teléfono o email…" class="g-input">
+  </div>
+  <select name="estado" class="g-select g-select--sm">
+    <option value="">Todos los estados</option>
+    {% for val, label in estado_choices %}
+    <option value="{{ val }}" {% if filtro_estado == val %}selected{% endif %}>{{ label }}</option>
+    {% endfor %}
+  </select>
+  <select name="prioridad" class="g-select g-select--sm">
+    <option value="">Todas las prioridades</option>
+    {% for val, label in prioridad_choices %}
+    <option value="{{ val }}" {% if filtro_prioridad == val %}selected{% endif %}>{{ label }}</option>
+    {% endfor %}
+  </select>
+  <button type="submit" class="g-btn g-btn--secondary g-btn--sm">Filtrar</button>
+  {% if q or filtro_estado or filtro_prioridad %}
+  <a href="{% url 'gestion:prospecto_lista' %}" class="g-btn g-btn--ghost g-btn--sm">Limpiar</a>
+  {% endif %}
+</form>
+
+<!-- Tabla -->
+<div class="g-card g-card--table">
+  {% if page_obj %}
+  <table class="g-table">
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Teléfono</th>
+        <th>Estado</th>
+        <th>Prioridad</th>
+        <th>Próximo seguimiento</th>
+        <th>Responsable</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in page_obj %}
+      <tr>
+        <td>
+          <a href="{% url 'gestion:prospecto_detalle' pk=p.pk %}" class="g-table__link">
+            {{ p.nombre }}
+          </a>
+          {% if p.email %}<small class="g-table__sub">{{ p.email }}</small>{% endif %}
+        </td>
+        <td>{{ p.telefono }}</td>
+        <td>
+          <span class="g-badge" style="background:{{ estados_color|default:'' }}{% for k, c in estados_color.items %}{% if k == p.estado %}{{ c }}{% endif %}{% endfor %}">
+            {{ p.get_estado_display }}
+          </span>
+        </td>
+        <td>
+          <span class="g-prioridad g-prioridad--{{ p.prioridad }}">{{ p.get_prioridad_display }}</span>
+        </td>
+        <td>
+          {% if p.proximo_seguimiento %}
+            <span class="{% if p.proximo_seguimiento < today %}g-text--danger{% endif %}">
+              {{ p.proximo_seguimiento|date:"d/m/Y" }}
+            </span>
+          {% else %}—{% endif %}
+        </td>
+        <td>{{ p.responsable.get_short_name|default:"—" }}</td>
+        <td class="g-table__actions">
+          <a href="{% url 'gestion:prospecto_detalle' pk=p.pk %}" class="g-btn g-btn--xs g-btn--ghost" title="Ver detalle">👁</a>
+          <a href="{% url 'gestion:prospecto_editar' pk=p.pk %}" class="g-btn g-btn--xs g-btn--ghost" title="Editar">✏️</a>
+          <a href="{% url 'gestion:reunion_nueva' %}?prospecto={{ p.pk }}" class="g-btn g-btn--xs g-btn--ghost" title="Nueva reunión">🤝</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <!-- Paginación -->
+  {% if page_obj.has_other_pages %}
+  <div class="g-pagination">
+    {% if page_obj.has_previous %}
+    <a href="?page={{ page_obj.previous_page_number }}&q={{ q }}&estado={{ filtro_estado }}&prioridad={{ filtro_prioridad }}" class="g-btn g-btn--ghost g-btn--sm">← Anterior</a>
+    {% endif %}
+    <span class="g-pagination__info">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}&q={{ q }}&estado={{ filtro_estado }}&prioridad={{ filtro_prioridad }}" class="g-btn g-btn--ghost g-btn--sm">Siguiente →</a>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {% else %}
+  <div class="g-empty-state">
+    <div class="g-empty-state__icon">👥</div>
+    <p>No hay prospectos{% if q or filtro_estado %} que coincidan con los filtros{% endif %}.</p>
+    <a href="{% url 'gestion:prospecto_nuevo' %}" class="g-btn g-btn--primary">Crear primer prospecto</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Pasar today para colorear fechas vencidas
+const today = new Date().toISOString().split('T')[0];
+document.querySelectorAll('[data-fecha]').forEach(el => {
+  if (el.dataset.fecha < today) el.classList.add('g-text--danger');
+});
+</script>
+{% endblock %}

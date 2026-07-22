@@ -1,0 +1,158 @@
+{% extends "gestion/base_gestion.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block nav_dashboard %}active{% endblock %}
+{% block breadcrumb %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="g-page-header">
+  <h1 class="g-page-title">Buenos días 👋</h1>
+  <div class="g-page-actions">
+    <a href="{% url 'gestion:prospecto_nuevo' %}" class="g-btn g-btn--primary">+ Nuevo prospecto</a>
+    <a href="{% url 'gestion:reunion_nueva' %}" class="g-btn g-btn--secondary">+ Nueva reunión</a>
+  </div>
+</div>
+
+<!-- KPIs -->
+<div class="g-kpi-grid">
+  <div class="g-kpi g-kpi--blue">
+    <div class="g-kpi__value">{{ reuniones_hoy.count }}</div>
+    <div class="g-kpi__label">Reuniones hoy</div>
+  </div>
+  <div class="g-kpi g-kpi--orange">
+    <div class="g-kpi__value">{{ tareas_vencidas.count }}</div>
+    <div class="g-kpi__label">Seguimientos vencidos</div>
+  </div>
+  <div class="g-kpi g-kpi--green">
+    <div class="g-kpi__value">{{ nuevos_esta_semana }}</div>
+    <div class="g-kpi__label">Nuevos esta semana</div>
+  </div>
+  <div class="g-kpi g-kpi--teal">
+    <div class="g-kpi__value">{{ ventas_mes }}</div>
+    <div class="g-kpi__label">Ventas este mes</div>
+  </div>
+</div>
+
+<div class="g-dashboard-grid">
+
+  <!-- Agenda del día -->
+  <section class="g-card">
+    <div class="g-card__header">
+      <h2 class="g-card__title">📅 Agenda de hoy</h2>
+      <a href="{% url 'gestion:reunion_nueva' %}" class="g-btn g-btn--sm g-btn--ghost">+ Reunión</a>
+    </div>
+
+    {% if reuniones_hoy %}
+    <ul class="g-timeline">
+      {% for reunion in reuniones_hoy %}
+      <li class="g-timeline__item">
+        <span class="g-timeline__time">{{ reunion.hora_inicio|time:"H:i" }}</span>
+        <div class="g-timeline__body">
+          <div class="g-timeline__title">
+            <a href="{% url 'gestion:reunion_editar' pk=reunion.pk %}">{{ reunion.titulo }}</a>
+          </div>
+          <div class="g-timeline__sub">{{ reunion.prospecto.nombre }} · {{ reunion.get_modalidad_display }}</div>
+        </div>
+        <span class="g-badge" style="background:{{ reunion.get_estado_color }}">{{ reunion.get_estado_display }}</span>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="g-empty">No hay reuniones agendadas para hoy.</p>
+    {% endif %}
+
+    {% if tareas_hoy %}
+    <div class="g-card__divider">Tareas para hoy</div>
+    <ul class="g-checklist">
+      {% for tarea in tareas_hoy %}
+      <li class="g-checklist__item">
+        <form method="post" action="{% url 'gestion:tarea_completar' pk=tarea.pk %}" style="display:inline">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="/gestion/">
+          <button type="submit" class="g-checklist__check" title="Marcar completada">○</button>
+        </form>
+        <div class="g-checklist__text">
+          <span>{{ tarea.titulo }}</span>
+          <small>{{ tarea.prospecto.nombre }}</small>
+        </div>
+        {% if tarea.prioridad == 'alta' %}
+          <span class="g-badge g-badge--danger">Alta</span>
+        {% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+  </section>
+
+  <!-- Seguimientos vencidos -->
+  <section class="g-card">
+    <div class="g-card__header">
+      <h2 class="g-card__title">⚠️ Seguimientos vencidos</h2>
+    </div>
+    {% if tareas_vencidas %}
+    <ul class="g-list">
+      {% for tarea in tareas_vencidas %}
+      <li class="g-list__item g-list__item--danger">
+        <div class="g-list__body">
+          <a href="{% url 'gestion:prospecto_detalle' pk=tarea.prospecto.pk %}">{{ tarea.prospecto.nombre }}</a>
+          <small>{{ tarea.titulo }} · {{ tarea.fecha|date:"d/m/Y" }}</small>
+        </div>
+        <form method="post" action="{% url 'gestion:tarea_completar' pk=tarea.pk %}">
+          {% csrf_token %}
+          <button type="submit" class="g-btn g-btn--xs g-btn--ghost">✓</button>
+        </form>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="g-empty">No hay seguimientos vencidos.</p>
+    {% endif %}
+  </section>
+
+  <!-- Próximas reuniones (7 días) -->
+  <section class="g-card">
+    <div class="g-card__header">
+      <h2 class="g-card__title">📆 Próximos 7 días</h2>
+      <a href="{% url 'gestion:calendario' %}" class="g-btn g-btn--sm g-btn--ghost">Ver calendario</a>
+    </div>
+    {% if proximos_7_dias %}
+    <ul class="g-list">
+      {% for r in proximos_7_dias %}
+      <li class="g-list__item">
+        <div class="g-list__body">
+          <a href="{% url 'gestion:reunion_editar' pk=r.pk %}">{{ r.titulo }}</a>
+          <small>{{ r.fecha|date:"d/m" }} {{ r.hora_inicio|time:"H:i" }} · {{ r.prospecto.nombre }}</small>
+        </div>
+        <span class="g-badge" style="background:{{ r.get_estado_color }}">{{ r.get_estado_display }}</span>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="g-empty">No hay reuniones en los próximos 7 días.</p>
+    {% endif %}
+  </section>
+
+  <!-- Pipeline por estado -->
+  <section class="g-card">
+    <div class="g-card__header">
+      <h2 class="g-card__title">📊 Pipeline</h2>
+      <a href="{% url 'gestion:prospecto_lista' %}" class="g-btn g-btn--sm g-btn--ghost">Ver todos</a>
+    </div>
+    <div class="g-pipeline">
+      {% for estado_key, estado_label in estados_label.items %}
+      <div class="g-pipeline__row">
+        <a href="{% url 'gestion:prospecto_lista' %}?estado={{ estado_key }}" class="g-pipeline__label">
+          {{ estado_label }}
+        </a>
+        <div class="g-pipeline__bar-wrap">
+          <div class="g-pipeline__bar" style="width:{{ pipeline|default_if_none:0 }}%"></div>
+        </div>
+        <span class="g-pipeline__count">
+          {{ pipeline|default_if_none:0 }}
+        </span>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+</div>
+{% endblock %}

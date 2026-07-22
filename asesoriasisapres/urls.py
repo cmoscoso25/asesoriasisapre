@@ -9,6 +9,7 @@ sitemaps = {'static': StaticSitemap}
 
 urlpatterns = [
     path('gestion-interna/', admin.site.urls),
+    path('gestion/',         include('gestion.urls', namespace='gestion')),
     path('', include('core.urls')),
     path('leads/', include('leads.urls')),
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='sitemap'),

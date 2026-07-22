@@ -1,0 +1,78 @@
+{% extends "gestion/base_gestion.html" %}
+{% block title %}{{ titulo }}{% endblock %}
+{% block nav_reuniones %}active{% endblock %}
+{% block breadcrumb %}
+  <a href="{% url 'gestion:reunion_lista' %}">Reuniones</a> › {{ titulo }}
+{% endblock %}
+
+{% block content %}
+<div class="g-page-header">
+  <h1 class="g-page-title">{{ titulo }}</h1>
+</div>
+
+<div class="g-form-container">
+  <form method="post" class="g-form" novalidate>
+    {% csrf_token %}
+
+    <div class="g-form-section">
+      <div class="g-form-grid">
+        <div class="g-form-row g-form-row--full">
+          <label class="g-label" for="{{ form.prospecto.id_for_label }}">Prospecto *</label>
+          {{ form.prospecto }}
+          {% if form.prospecto.errors %}<span class="g-error">{{ form.prospecto.errors.0 }}</span>{% endif %}
+        </div>
+        <div class="g-form-row g-form-row--full">
+          <label class="g-label" for="{{ form.titulo.id_for_label }}">Título de la reunión *</label>
+          {{ form.titulo }}
+          {% if form.titulo.errors %}<span class="g-error">{{ form.titulo.errors.0 }}</span>{% endif %}
+        </div>
+        <div class="g-form-row">
+          <label class="g-label" for="{{ form.fecha.id_for_label }}">Fecha *</label>
+          {{ form.fecha }}
+        </div>
+        <div class="g-form-row">
+          <label class="g-label" for="{{ form.hora_inicio.id_for_label }}">Hora inicio *</label>
+          {{ form.hora_inicio }}
+        </div>
+        <div class="g-form-row">
+          <label class="g-label" for="{{ form.hora_fin.id_for_label }}">Hora fin</label>
+          {{ form.hora_fin }}
+        </div>
+        <div class="g-form-row">
+          <label class="g-label" for="{{ form.modalidad.id_for_label }}">Modalidad *</label>
+          {{ form.modalidad }}
+        </div>
+        <div class="g-form-row g-form-row--full">
+          <label class="g-label" for="{{ form.ubicacion.id_for_label }}">Ubicación / Enlace</label>
+          {{ form.ubicacion }}
+        </div>
+        <div class="g-form-row">
+          <label class="g-label" for="{{ form.recordatorio_minutos.id_for_label }}">Recordatorio</label>
+          {{ form.recordatorio_minutos }}
+        </div>
+        <div class="g-form-row">
+          <label class="g-label" for="{{ form.estado.id_for_label }}">Estado</label>
+          {{ form.estado }}
+        </div>
+        <div class="g-form-row g-form-row--full">
+          <label class="g-label" for="{{ form.descripcion.id_for_label }}">Descripción / Agenda</label>
+          {{ form.descripcion }}
+        </div>
+        {% if reunion %}
+        <div class="g-form-row g-form-row--full">
+          <label class="g-label" for="{{ form.resultado.id_for_label }}">Resultado de la reunión</label>
+          {{ form.resultado }}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="g-form-actions">
+      <button type="submit" class="g-btn g-btn--primary">
+        {% if reunion %}Guardar cambios{% else %}Agendar reunión{% endif %}
+      </button>
+      <a href="{% url 'gestion:reunion_lista' %}" class="g-btn g-btn--ghost">Cancelar</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

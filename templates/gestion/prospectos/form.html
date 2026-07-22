@@ -1,0 +1,127 @@
+{% extends "gestion/base_gestion.html" %}
+{% block title %}{{ titulo }}{% endblock %}
+{% block nav_prospectos %}active{% endblock %}
+{% block breadcrumb %}
+  <a href="{% url 'gestion:prospecto_lista' %}">Prospectos</a>
+  {% if prospecto %} › <a href="{% url 'gestion:prospecto_detalle' pk=prospecto.pk %}">{{ prospecto.nombre }}</a>{% endif %}
+  › {{ titulo }}
+{% endblock %}
+
+{% block content %}
+<div class="g-page-header">
+  <h1 class="g-page-title">{{ titulo }}</h1>
+</div>
+
+<div class="g-form-container">
+  <form method="post" class="g-form" novalidate>
+    {% csrf_token %}
+
+    <div class="g-form-section">
+      <h3 class="g-form-section__title">Datos de contacto</h3>
+      <div class="g-form-grid">
+        <div class="g-form-row">
+          <label class="g-label" for="{{ form.nombre.id_for_label }}">Nombre completo *</label>
+          {{ form.nombre }}
+          {% if form.nombre.errors %}<span class="g-error">{{ form.nombre.errors.0 }}</span>{% endif %}
+        </div>
+        <div class="g-form-row">
+          <label class="g-label" for="{{ form.rut.id_for_label }}">RUT</label>
+          {{ form.rut }}
+        </div>
+        <div class="g-form-row">
+          <label class="g-label" for="{{ form.telefono.id_for_label }}">Teléfono *</label>
+          {{ form.telefono }}
+          {% if form.telefono.errors %}<span class="g-error">{{ form.telefono.errors.0 }}</span>{% endif %}
+        </div>
+        <div class="g-form-row">
+          <label class="g-label" for="{{ form.email.id_for_label }}">Email</label>
+          {{ form.email }}
+        </div>
+        <div class="g-form-row">
+          <label class="g-label" for="{{ form.ciudad.id_for_label }}">Ciudad</label>
+          {{ form.ciudad }}
+        </div>
+        <div class="g-form-row">
+          <label class="g-label" for="{{ form.region.id_for_label }}">Región</label>
+          {{ form.region }}
+        </div>
+      </div>
+    </div>
+
+    <div class="g-form-section">
+      <h3 class="g-form-section__title">Información de salud</h3>
+      <div class="g-form-grid">
+        <div class="g-form-row">
+          <label class="g-label" for="{{ form.isapre_actual.id_for_label }}">Previsión actual</label>
+          {{ form.isapre_actual }}
+        </div>
+        <div class="g-form-row">
+          <label class="g-label" for="{{ form.plan_actual.id_for_label }}">Plan actual</label>
+          {{ form.plan_actual }}
+        </div>
+        <div class="g-form-row">
+          <label class="g-label" for="{{ form.renta.id_for_label }}">Renta imponible (CLP)</label>
+          {{ form.renta }}
+        </div>
+        <div class="g-form-row">
+          <label class="g-label" for="{{ form.edad.id_for_label }}">Edad</label>
+          {{ form.edad }}
+        </div>
+        <div class="g-form-row">
+          <label class="g-label" for="{{ form.cargas.id_for_label }}">Cargas familiares</label>
+          {{ form.cargas }}
+        </div>
+        <div class="g-form-row">
+          <label class="g-label" for="{{ form.clinica_preferente.id_for_label }}">Clínica preferente</label>
+          {{ form.clinica_preferente }}
+        </div>
+        <div class="g-form-row g-form-row--full">
+          <label class="g-label" for="{{ form.motivo_asesoria.id_for_label }}">Motivo de la asesoría</label>
+          {{ form.motivo_asesoria }}
+        </div>
+      </div>
+    </div>
+
+    <div class="g-form-section">
+      <h3 class="g-form-section__title">Gestión comercial</h3>
+      <div class="g-form-grid">
+        <div class="g-form-row">
+          <label class="g-label" for="{{ form.origen.id_for_label }}">Origen del contacto</label>
+          {{ form.origen }}
+        </div>
+        <div class="g-form-row">
+          <label class="g-label" for="{{ form.estado.id_for_label }}">Estado</label>
+          {{ form.estado }}
+        </div>
+        <div class="g-form-row">
+          <label class="g-label" for="{{ form.prioridad.id_for_label }}">Prioridad</label>
+          {{ form.prioridad }}
+        </div>
+        <div class="g-form-row">
+          <label class="g-label" for="{{ form.proximo_seguimiento.id_for_label }}">Próximo seguimiento</label>
+          {{ form.proximo_seguimiento }}
+        </div>
+        <div class="g-form-row">
+          <label class="g-label" for="{{ form.responsable.id_for_label }}">Responsable</label>
+          {{ form.responsable }}
+        </div>
+        <div class="g-form-row g-form-row--full">
+          <label class="g-label" for="{{ form.observaciones.id_for_label }}">Observaciones</label>
+          {{ form.observaciones }}
+        </div>
+      </div>
+    </div>
+
+    <div class="g-form-actions">
+      <button type="submit" class="g-btn g-btn--primary">
+        {% if prospecto %}Guardar cambios{% else %}Crear prospecto{% endif %}
+      </button>
+      {% if prospecto %}
+      <a href="{% url 'gestion:prospecto_detalle' pk=prospecto.pk %}" class="g-btn g-btn--ghost">Cancelar</a>
+      {% else %}
+      <a href="{% url 'gestion:prospecto_lista' %}" class="g-btn g-btn--ghost">Cancelar</a>
+      {% endif %}
+    </div>
+  </form>
+</div>
+{% endblock %}

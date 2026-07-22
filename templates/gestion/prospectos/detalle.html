@@ -1,0 +1,235 @@
+{% extends "gestion/base_gestion.html" %}
+{% block title %}{{ prospecto.nombre }}{% endblock %}
+{% block nav_prospectos %}active{% endblock %}
+{% block breadcrumb %}
+  <a href="{% url 'gestion:prospecto_lista' %}">Prospectos</a> › {{ prospecto.nombre }}
+{% endblock %}
+
+{% block content %}
+<div class="g-page-header">
+  <div>
+    <h1 class="g-page-title">{{ prospecto.nombre }}</h1>
+    <div class="g-page-meta">
+      <span class="g-badge" style="background:{{ prospecto.get_estado_color }}">
+        {{ prospecto.get_estado_display }}
+      </span>
+      <span class="g-badge g-badge--neutral">{{ prospecto.get_prioridad_display }} prioridad</span>
+      <span class="g-badge g-badge--neutral">{{ prospecto.get_origen_display }}</span>
+    </div>
+  </div>
+  <div class="g-page-actions">
+    <a href="{% url 'gestion:reunion_nueva' %}?prospecto={{ prospecto.pk }}" class="g-btn g-btn--secondary">+ Reunión</a>
+    <a href="{% url 'gestion:tarea_nueva' %}?prospecto={{ prospecto.pk }}" class="g-btn g-btn--secondary">+ Tarea</a>
+    <a href="{% url 'gestion:prospecto_editar' pk=prospecto.pk %}" class="g-btn g-btn--ghost">Editar</a>
+  </div>
+</div>
+
+<div class="g-detail-grid">
+
+  <!-- Columna izquierda: ficha -->
+  <div class="g-detail-left">
+
+    <!-- Datos de contacto -->
+    <div class="g-card">
+      <div class="g-card__header"><h2 class="g-card__title">Datos de contacto</h2></div>
+      <dl class="g-dl">
+        <dt>Teléfono</dt>
+        <dd>
+          <a href="https://wa.me/56{{ prospecto.telefono|cut:' '|cut:'+' }}" target="_blank" class="g-link">
+            {{ prospecto.telefono }} 💬
+          </a>
+        </dd>
+        {% if prospecto.email %}<dt>Email</dt><dd><a href="mailto:{{ prospecto.email }}" class="g-link">{{ prospecto.email }}</a></dd>{% endif %}
+        {% if prospecto.ciudad %}<dt>Ciudad</dt><dd>{{ prospecto.ciudad }}</dd>{% endif %}
+        {% if prospecto.region %}<dt>Región</dt><dd>{{ prospecto.get_region_display }}</dd>{% endif %}
+        {% if prospecto.rut %}<dt>RUT</dt><dd>{{ prospecto.rut }}</dd>{% endif %}
+      </dl>
+    </div>
+
+    <!-- Datos de salud -->
+    <div class="g-card">
+      <div class="g-card__header"><h2 class="g-card__title">Información de salud</h2></div>
+      <dl class="g-dl">
+        {% if prospecto.isapre_actual %}<dt>Previsión actual</dt><dd>{{ prospecto.isapre_actual }}</dd>{% endif %}
+        {% if prospecto.plan_actual %}<dt>Plan actual</dt><dd>{{ prospecto.plan_actual }}</dd>{% endif %}
+        {% if prospecto.renta %}<dt>Renta</dt><dd>{{ prospecto.renta_display }}</dd>{% endif %}
+        {% if prospecto.edad %}<dt>Edad</dt><dd>{{ prospecto.edad }} años</dd>{% endif %}
+        {% if prospecto.cargas %}<dt>Cargas</dt><dd>{{ prospecto.get_cargas_display }}</dd>{% endif %}
+        {% if prospecto.clinica_preferente %}<dt>Clínica preferente</dt><dd>{{ prospecto.get_clinica_preferente_display }}</dd>{% endif %}
+        {% if prospecto.motivo_asesoria %}<dt>Motivo</dt><dd>{{ prospecto.motivo_asesoria }}</dd>{% endif %}
+      </dl>
+    </div>
+
+    <!-- Gestión comercial -->
+    <div class="g-card">
+      <div class="g-card__header"><h2 class="g-card__title">Gestión</h2></div>
+      <dl class="g-dl">
+        <dt>Estado</dt>
+        <dd>
+          <form method="post" action="{% url 'gestion:prospecto_cambiar_estado' pk=prospecto.pk %}" class="g-inline-form">
+            {% csrf_token %}
+            <select name="estado" class="g-select g-select--sm" onchange="this.form.submit()">
+              {% for val, label in estados %}
+              <option value="{{ val }}" {% if val == prospecto.estado %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+          </form>
+        </dd>
+        {% if prospecto.proximo_seguimiento %}
+        <dt>Próximo seguimiento</dt>
+        <dd class="{% if prospecto.proximo_seguimiento < today %}g-text--danger{% endif %}">
+          {{ prospecto.proximo_seguimiento|date:"d/m/Y" }}
+        </dd>
+        {% endif %}
+        {% if prospecto.responsable %}<dt>Responsable</dt><dd>{{ prospecto.responsable.get_full_name|default:prospecto.responsable.username }}</dd>{% endif %}
+        {% if prospecto.observaciones %}<dt>Observaciones</dt><dd>{{ prospecto.observaciones }}</dd>{% endif %}
+      </dl>
+    </div>
+
+    <!-- Lead web vinculado -->
+    {% if prospecto.lead %}
+    <div class="g-card">
+      <div class="g-card__header"><h2 class="g-card__title">Lead web vinculado</h2></div>
+      <dl class="g-dl">
+        <dt>Fecha formulario</dt><dd>{{ prospecto.lead.creado|date:"d/m/Y H:i" }}</dd>
+        {% if prospecto.lead.ahorro_estimado_min %}
+        <dt>Ahorro estimado</dt><dd>{{ prospecto.lead.ahorro_display }}</dd>
+        {% endif %}
+        {% if prospecto.lead.utm_source %}<dt>Fuente</dt><dd>{{ prospecto.lead.utm_source }}</dd>{% endif %}
+      </dl>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Columna derecha: actividad -->
+  <div class="g-detail-right">
+
+    <!-- Reuniones -->
+    {% if reuniones %}
+    <div class="g-card">
+      <div class="g-card__header">
+        <h2 class="g-card__title">Reuniones</h2>
+        <a href="{% url 'gestion:reunion_nueva' %}?prospecto={{ prospecto.pk }}" class="g-btn g-btn--sm g-btn--ghost">+</a>
+      </div>
+      <ul class="g-list">
+        {% for r in reuniones %}
+        <li class="g-list__item">
+          <div class="g-list__body">
+            <a href="{% url 'gestion:reunion_editar' pk=r.pk %}">{{ r.titulo }}</a>
+            <small>{{ r.fecha|date:"d/m/Y" }} {{ r.hora_inicio|time:"H:i" }} · {{ r.get_modalidad_display }}</small>
+          </div>
+          <span class="g-badge" style="background:{{ r.get_estado_color }}">{{ r.get_estado_display }}</span>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+    <!-- Tareas pendientes -->
+    {% if tareas %}
+    <div class="g-card">
+      <div class="g-card__header">
+        <h2 class="g-card__title">Tareas</h2>
+        <a href="{% url 'gestion:tarea_nueva' %}?prospecto={{ prospecto.pk }}" class="g-btn g-btn--sm g-btn--ghost">+</a>
+      </div>
+      <ul class="g-checklist">
+        {% for t in tareas %}
+        <li class="g-checklist__item {% if t.estado == 'completada' %}g-checklist__item--done{% endif %}">
+          {% if t.estado == 'pendiente' or t.estado == 'proceso' %}
+          <form method="post" action="{% url 'gestion:tarea_completar' pk=t.pk %}">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.path }}">
+            <button type="submit" class="g-checklist__check" title="Completar">○</button>
+          </form>
+          {% else %}
+          <span class="g-checklist__check g-checklist__check--done">✓</span>
+          {% endif %}
+          <div class="g-checklist__text">
+            <span>{{ t.titulo }}</span>
+            <small>{{ t.fecha|date:"d/m/Y" }}{% if t.hora %} {{ t.hora|time:"H:i" }}{% endif %} · {{ t.get_tipo_display }}</small>
+          </div>
+          <span class="g-badge g-badge--{{ t.prioridad }}">{{ t.get_prioridad_display }}</span>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+    <!-- Registro nueva gestión -->
+    <div class="g-card">
+      <div class="g-card__header"><h2 class="g-card__title">Registrar gestión</h2></div>
+      <form method="post" action="{% url 'gestion:gestion_nueva' prospecto_pk=prospecto.pk %}">
+        {% csrf_token %}
+        <div class="g-form-row">
+          {{ gestion_form.tipo.label_tag }}
+          {{ gestion_form.tipo }}
+        </div>
+        <div class="g-form-row">
+          {{ gestion_form.descripcion.label_tag }}
+          {{ gestion_form.descripcion }}
+        </div>
+        <div class="g-form-row">
+          {{ gestion_form.resultado.label_tag }}
+          {{ gestion_form.resultado }}
+        </div>
+        <div class="g-form-2col">
+          <div class="g-form-row">
+            {{ gestion_form.proxima_accion.label_tag }}
+            {{ gestion_form.proxima_accion }}
+          </div>
+          <div class="g-form-row">
+            {{ gestion_form.fecha_proxima_accion.label_tag }}
+            {{ gestion_form.fecha_proxima_accion }}
+          </div>
+        </div>
+        <button type="submit" class="g-btn g-btn--primary">Guardar gestión</button>
+      </form>
+    </div>
+
+    <!-- Timeline de actividad -->
+    <div class="g-card">
+      <div class="g-card__header"><h2 class="g-card__title">Historial de actividad</h2></div>
+      {% if gestiones %}
+      <ul class="g-activity">
+        {% for g in gestiones %}
+        <li class="g-activity__item">
+          <div class="g-activity__icon">{{ g.get_tipo_icon }}</div>
+          <div class="g-activity__body">
+            <div class="g-activity__header">
+              <strong>{{ g.get_tipo_display }}</strong>
+              <span class="g-activity__date">{{ g.fecha|date:"d/m/Y H:i" }}</span>
+            </div>
+            <p class="g-activity__desc">{{ g.descripcion }}</p>
+            {% if g.resultado %}<p class="g-activity__result">Resultado: {{ g.resultado }}</p>{% endif %}
+            {% if g.proxima_accion %}<p class="g-activity__next">→ {{ g.proxima_accion }}</p>{% endif %}
+            <small class="g-activity__user">{{ g.usuario.get_full_name|default:g.usuario.username|default:"—" }}</small>
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p class="g-empty">No hay actividad registrada aún.</p>
+      {% endif %}
+    </div>
+
+  </div><!-- /detail-right -->
+</div>
+
+<!-- Archivar (zona peligrosa) -->
+<div class="g-danger-zone">
+  <form method="post" action="{% url 'gestion:prospecto_archivar' pk=prospecto.pk %}"
+        onsubmit="return confirm('¿Archivar a {{ prospecto.nombre }}? Podrás verlo en el admin.')">
+    {% csrf_token %}
+    <button type="submit" class="g-btn g-btn--danger g-btn--sm">Archivar prospecto</button>
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const today = "{% now 'Y-m-d' %}";
+document.querySelectorAll('[data-fecha]').forEach(el => {
+  if (el.dataset.fecha && el.dataset.fecha < today) el.classList.add('g-text--danger');
+});
+</script>
+{% endblock %}
