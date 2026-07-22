@@ -600,3 +600,22 @@ def outlook_desconectar(request):
     except ConexionOutlook.DoesNotExist:
         messages.info(request, 'No había conexión con Outlook.')
     return redirect('gestion:outlook_estado')
+
+
+# ---------------------------------------------------------------------------
+# Cron endpoint (llamado por cron-job.org cada 5 min)
+# ---------------------------------------------------------------------------
+
+def cron_recordatorios(request):
+    import os
+    from io import StringIO
+    from django.core.management import call_command
+
+    secret = os.environ.get('CRON_SECRET', '')
+    if not secret or request.GET.get('secret') != secret:
+        from django.http import HttpResponseForbidden
+        return HttpResponseForbidden('Forbidden')
+
+    out = StringIO()
+    call_command('enviar_recordatorios', stdout=out)
+    return JsonResponse({'ok': True, 'log': out.getvalue()})

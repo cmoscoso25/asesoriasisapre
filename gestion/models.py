@@ -218,8 +218,10 @@ class Reunion(models.Model):
     estado              = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='agendada')
     resultado           = models.TextField(blank=True)
 
-    outlook_event_id    = models.CharField(max_length=500, blank=True, db_index=True)
-    outlook_sync_at     = models.DateTimeField(null=True, blank=True)
+    outlook_event_id     = models.CharField(max_length=500, blank=True, db_index=True)
+    outlook_sync_at      = models.DateTimeField(null=True, blank=True)
+
+    recordatorio_enviado = models.BooleanField(default=False)
 
     creado      = models.DateTimeField(auto_now_add=True)
     actualizado = models.DateTimeField(auto_now=True)

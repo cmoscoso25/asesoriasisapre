@@ -152,6 +152,11 @@ MICROSOFT_REDIRECT_URI  = os.environ.get(
 
 LOGIN_URL = '/gestion-interna/login/'
 
+# Notificaciones recordatorio reuniones
+CALLMEBOT_PHONE  = os.environ.get('CALLMEBOT_PHONE', '')   # ej: +56912345678
+CALLMEBOT_APIKEY = os.environ.get('CALLMEBOT_APIKEY', '')
+CRON_SECRET      = os.environ.get('CRON_SECRET', '')        # token para /gestion/cron/recordatorios/
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,

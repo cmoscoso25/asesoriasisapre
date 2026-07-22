@@ -40,4 +40,7 @@ urlpatterns = [
     path('outlook/conectar/',                   views.outlook_conectar,      name='outlook_conectar'),
     path('outlook/callback/',                   views.outlook_callback,      name='outlook_callback'),
     path('outlook/desconectar/',                views.outlook_desconectar,   name='outlook_desconectar'),
+
+    # Cron — protegido por ?secret=CRON_SECRET
+    path('cron/recordatorios/',                 views.cron_recordatorios,    name='cron_recordatorios'),
 ]
