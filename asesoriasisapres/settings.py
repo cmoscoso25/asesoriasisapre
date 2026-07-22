@@ -152,10 +152,11 @@ MICROSOFT_REDIRECT_URI  = os.environ.get(
 
 LOGIN_URL = '/gestion-interna/login/'
 
-# Notificaciones recordatorio reuniones
-CALLMEBOT_PHONE  = os.environ.get('CALLMEBOT_PHONE', '')   # ej: +56912345678
-CALLMEBOT_APIKEY = os.environ.get('CALLMEBOT_APIKEY', '')
-CRON_SECRET      = os.environ.get('CRON_SECRET', '')        # token para /gestion/cron/recordatorios/
+# Notificaciones recordatorio reuniones (WhatsApp via UltraMsg)
+ULTRAMSG_INSTANCE = os.environ.get('ULTRAMSG_INSTANCE', '')  # ej: instance123456
+ULTRAMSG_TOKEN    = os.environ.get('ULTRAMSG_TOKEN', '')
+ULTRAMSG_PHONE    = os.environ.get('ULTRAMSG_PHONE', '')     # ej: +56912345678
+CRON_SECRET       = os.environ.get('CRON_SECRET', '')        # token para /gestion/cron/recordatorios/
 
 LOGGING = {
     'version': 1,

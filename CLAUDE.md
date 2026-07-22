@@ -39,8 +39,9 @@ Sitio web Django para asesoría de isapres en Chile. Deploy automático: GitHub 
 | `MICROSOFT_CLIENT_SECRET` | Azure App Registration Secret (opcional) |
 | `MICROSOFT_TENANT_ID` | `common` o ID del tenant (opcional) |
 | `MICROSOFT_REDIRECT_URI` | `https://asesoriasisapres.com/gestion/outlook/callback/` (opcional) |
-| `CALLMEBOT_PHONE` | Número WhatsApp en formato internacional, ej: `+56912345678` |
-| `CALLMEBOT_APIKEY` | API key de CallMeBot (se obtiene al activar el bot) |
+| `ULTRAMSG_INSTANCE` | ID de instancia UltraMsg, ej: `instance123456` |
+| `ULTRAMSG_TOKEN` | Token de la instancia UltraMsg |
+| `ULTRAMSG_PHONE` | Número destino WhatsApp, ej: `+56912345678` |
 | `CRON_SECRET` | Token secreto para proteger `/gestion/cron/recordatorios/` |
 | `DJANGO_SUPERUSER_USERNAME/EMAIL/PASSWORD` | Para crear superusuario en build |
 

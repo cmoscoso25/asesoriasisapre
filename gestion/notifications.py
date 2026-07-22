@@ -96,17 +96,18 @@ def enviar_email_recordatorio(reunion):
 
 
 def enviar_whatsapp_recordatorio(reunion):
-    phone = os.environ.get('CALLMEBOT_PHONE', '')
-    apikey = os.environ.get('CALLMEBOT_APIKEY', '')
-    if not phone or not apikey:
-        logger.warning("CALLMEBOT_PHONE o CALLMEBOT_APIKEY no configurados.")
+    instance = os.environ.get('ULTRAMSG_INSTANCE', '')
+    token    = os.environ.get('ULTRAMSG_TOKEN', '')
+    phone    = os.environ.get('ULTRAMSG_PHONE', '')
+    if not instance or not token or not phone:
+        logger.warning("ULTRAMSG_INSTANCE, ULTRAMSG_TOKEN o ULTRAMSG_PHONE no configurados.")
         return False
 
     hora = reunion.hora_inicio.strftime('%H:%M')
     prospecto = reunion.prospecto
     partes = [
-        f"⏰ *Recordatorio AsesoríasIsapres*",
-        f"Reunión en ~15 minutos:",
+        "⏰ *Recordatorio Asesorías Isapres*",
+        "Reunión en ~15 minutos:",
         f"\U0001f464 {prospecto.nombre}  |  {prospecto.telefono}",
         f"\U0001f4cb {reunion.titulo}",
         f"\U0001f550 {hora}  —  {reunion.get_modalidad_display()}",
@@ -115,12 +116,12 @@ def enviar_whatsapp_recordatorio(reunion):
         partes.append(f"\U0001f4cd {reunion.ubicacion}")
 
     mensaje = '\n'.join(partes)
-    encoded = urllib.parse.quote(mensaje)
-    url = f"https://api.callmebot.com/whatsapp.php?phone={phone}&text={encoded}&apikey={apikey}"
+    url = f"https://api.ultramsg.com/{instance}/messages/chat"
 
     try:
-        with urllib.request.urlopen(url, timeout=10) as resp:
-            logger.info("WhatsApp recordatorio enviado: reunión #%s (HTTP %s)", reunion.pk, resp.status)
+        r = requests.post(url, data={'token': token, 'to': phone, 'body': mensaje}, timeout=10)
+        r.raise_for_status()
+        logger.info("WhatsApp recordatorio enviado: reunión #%s", reunion.pk)
         return True
     except Exception as exc:
         logger.error("Error WhatsApp recordatorio reunión #%s: %s", reunion.pk, exc)
