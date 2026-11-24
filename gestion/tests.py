@@ -341,3 +341,58 @@ class CalendarioAPITest(TestCase):
         self.assertIn('title', data[0])
         self.assertIn('color', data[0])
         self.assertIn('url', data[0])
+
+
+# ── Seguridad Supabase: RLS + revoke de roles API ────────────────────────
+
+class AsegurarRLSTest(TestCase):
+
+    def test_no_hace_nada_fuera_de_postgresql(self):
+        from gestion.db_security import asegurar_rls
+        # Los tests corren en SQLite: debe salir sin ejecutar SQL.
+        self.assertEqual(asegurar_rls(), [])
+
+    def test_postgresql_activa_rls_y_revoca(self):
+        from contextlib import nullcontext
+        from unittest import mock
+        from gestion import db_security
+
+        ejecutadas = []
+        cursor = mock.MagicMock()
+        cursor.execute.side_effect = lambda sql, params=None: ejecutadas.append(sql)
+        cursor.fetchall.side_effect = [
+            [('gestion_prospecto',), ('leads_lead',)],   # tablas sin RLS
+            [('anon',), ('authenticated',)],             # roles existentes
+        ]
+        conn = mock.MagicMock(vendor='postgresql')
+        conn.cursor.return_value.__enter__.return_value = cursor
+        conn.ops.quote_name.side_effect = lambda n: f'"{n}"'
+
+        with mock.patch.object(db_security, 'connections', {'default': conn}), \
+             mock.patch.object(db_security.transaction, 'atomic', lambda using=None: nullcontext()):
+            corregidas = db_security.asegurar_rls()
+
+        self.assertEqual(corregidas, ['gestion_prospecto', 'leads_lead'])
+        sql = '\n'.join(ejecutadas)
+        self.assertIn('ALTER TABLE public."gestion_prospecto" ENABLE ROW LEVEL SECURITY', sql)
+        self.assertIn('ALTER TABLE public."leads_lead" ENABLE ROW LEVEL SECURITY', sql)
+        self.assertNotIn('FORCE', sql)
+        self.assertIn('REVOKE ALL ON ALL TABLES IN SCHEMA public FROM "anon", "authenticated"', sql)
+        self.assertIn('ALTER DEFAULT PRIVILEGES IN SCHEMA public REVOKE ALL ON TABLES FROM "anon", "authenticated"', sql)
+
+    def test_postgresql_sin_roles_supabase_no_revoca(self):
+        from contextlib import nullcontext
+        from unittest import mock
+        from gestion import db_security
+
+        ejecutadas = []
+        cursor = mock.MagicMock()
+        cursor.execute.side_effect = lambda sql, params=None: ejecutadas.append(sql)
+        cursor.fetchall.side_effect = [[], []]
+        conn = mock.MagicMock(vendor='postgresql')
+        conn.cursor.return_value.__enter__.return_value = cursor
+
+        with mock.patch.object(db_security, 'connections', {'default': conn}), \
+             mock.patch.object(db_security.transaction, 'atomic', lambda using=None: nullcontext()):
+            self.assertEqual(db_security.asegurar_rls(), [])
+        self.assertFalse(any('REVOKE' in s for s in ejecutadas))

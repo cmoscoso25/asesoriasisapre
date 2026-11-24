@@ -78,7 +78,7 @@ py manage.py collectstatic --no-input
 - Solo usuarios con `is_staff=True` (decorador `@staff_required` en `gestion/views.py`)
 - Login redirige a `/gestion-interna/login/`
 - Sincronización Outlook: opcional, requiere `MICROSOFT_CLIENT_ID` configurado
-- Tests: `py manage.py test gestion` — 35 tests, todos deben pasar
+- Tests: `py manage.py test gestion` — 38 tests, todos deben pasar
 
 ## Integración Lead → Prospecto
 
@@ -89,3 +89,4 @@ Signal en `gestion/signals.py`: cuando se crea un `Lead` desde el formulario web
 - RLS activado (`ENABLE`) en todas las tablas públicas
 - **No usar** `FORCE ROW LEVEL SECURITY` — bloquea al usuario `postgres` (Django) y tira la app
 - Django se conecta directo con el usuario `postgres` (no usa Supabase REST API)
+- **Automático:** tras cada `migrate` (señal `post_migrate` en `gestion/apps.py`) y en `build.sh` (`py manage.py asegurar_rls`) se activa RLS en tablas nuevas de `public` y se revoca todo a `anon`/`authenticated`. Lógica en `gestion/db_security.py`. Las migraciones que crean tablas ya no dejan tablas expuestas.
