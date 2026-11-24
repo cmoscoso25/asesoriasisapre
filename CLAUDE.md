@@ -78,7 +78,14 @@ py manage.py collectstatic --no-input
 - Solo usuarios con `is_staff=True` (decorador `@staff_required` en `gestion/views.py`)
 - Login redirige a `/gestion-interna/login/`
 - Sincronización Outlook: opcional, requiere `MICROSOFT_CLIENT_ID` configurado
-- Tests: `py manage.py test gestion` — 38 tests, todos deben pasar
+- Tests: `py manage.py test leads gestion` — 50 tests, todos deben pasar
+
+## Meta Pixel
+
+- ID `3609526355889947` (default de `META_PIXEL_ID`; vacío en Render = desactivado). Solo se carga con `DEBUG=False`.
+- Código en `static/js/meta-pixel.js` (sin script inline por la CSP), incluido una vez en `templates/base.html`. `autoConfig` desactivado.
+- Eventos: `PageView` (todas las páginas públicas), `Contact` (clic en enlaces `wa.me`), `Lead` en `/gracias/` vía marca de sesión de un solo uso `meta_lead_event` (se crea en `leads.views.nuevo_lead`, se consume en `core.views.gracias`, que es `@never_cache`).
+- **Nunca** enviar a Meta datos del formulario/diagnóstico (RUT, renta, clínica, situación) ni parámetros personalizados.
 
 ## Integración Lead → Prospecto
 

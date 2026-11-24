@@ -8,4 +8,6 @@ def seo_defaults(request):
         'canonical_url': f"https://asesoriasisapres.com{request.path}",
         'whatsapp_number': '56964345927',
         'tawkto_id': getattr(django_settings, 'TAWKTO_ID', ''),
+        # Meta Pixel solo en producción (DEBUG=False) y si META_PIXEL_ID no está vacío
+        'meta_pixel_id': '' if django_settings.DEBUG else getattr(django_settings, 'META_PIXEL_ID', ''),
     }

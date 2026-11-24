@@ -84,6 +84,15 @@
   <span class="whatsapp-float__tooltip">¿Necesitas ayuda?</span>
 </a>
 
+<!-- Meta Pixel (solo producción; ID desde META_PIXEL_ID). Va antes del resto de JS
+     para que gracias.js pueda encolar el evento Lead. -->
+{% if meta_pixel_id %}
+<div id="meta-pixel-cfg" data-id="{{ meta_pixel_id }}" hidden></div>
+<script src="{% static 'js/meta-pixel.js' %}" defer></script>
+<noscript><img height="1" width="1" style="display:none" alt=""
+  src="https://www.facebook.com/tr?id={{ meta_pixel_id }}&ev=PageView&noscript=1"></noscript>
+{% endif %}
+
 <!-- JS -->
 <script src="{% static 'js/diagnostico.js' %}" defer></script>
 

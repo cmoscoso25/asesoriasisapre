@@ -141,6 +141,10 @@ CACHES = {
 
 TAWKTO_ID = os.environ.get('TAWKTO_ID', '')
 
+# Meta Pixel (dataset de Events Manager). Para desactivarlo sin deploy de código,
+# definir META_PIXEL_ID vacío en Render. Solo se carga con DEBUG=False.
+META_PIXEL_ID = os.environ.get('META_PIXEL_ID', '3609526355889947')
+
 # Microsoft Graph / Outlook Calendar (opcional — solo para integración Outlook)
 MICROSOFT_CLIENT_ID     = os.environ.get('MICROSOFT_CLIENT_ID', '')
 MICROSOFT_CLIENT_SECRET = os.environ.get('MICROSOFT_CLIENT_SECRET', '')
@@ -205,11 +209,12 @@ AXES_META_PRECEDENCE_ORDER = ['HTTP_X_FORWARDED_FOR', 'REMOTE_ADDR']
 
 # Content Security Policy
 CSP_DEFAULT_SRC     = ("'self'",)
-CSP_SCRIPT_SRC      = ("'self'", "https://embed.tawk.to", "https://va.tawk.to")
+CSP_SCRIPT_SRC      = ("'self'", "https://embed.tawk.to", "https://va.tawk.to", "https://connect.facebook.net")
 CSP_STYLE_SRC       = ("'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://embed.tawk.to")
 CSP_FONT_SRC        = ("'self'", "https://fonts.gstatic.com", "https://embed.tawk.to")
 CSP_IMG_SRC         = ("'self'", "data:", "https:")
-CSP_CONNECT_SRC     = ("'self'", "https://*.tawk.to", "wss://*.tawk.to")
+CSP_CONNECT_SRC     = ("'self'", "https://*.tawk.to", "wss://*.tawk.to",
+                       "https://www.facebook.com", "https://connect.facebook.net")
 CSP_FRAME_SRC       = ("'self'", "https://tawk.to", "https://*.tawk.to")
 CSP_FRAME_ANCESTORS = ("'none'",)
 CSP_BASE_URI        = ("'self'",)

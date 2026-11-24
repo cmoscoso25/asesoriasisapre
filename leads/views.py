@@ -68,15 +68,18 @@ def nuevo_lead(request):
         if form.is_valid():
             lead = form.save(commit=False)
             lead.ip_address = ip
-            lead.utm_source   = request.GET.get('utm_source',   request.POST.get('utm_source', ''))
-            lead.utm_medium   = request.GET.get('utm_medium',   request.POST.get('utm_medium', ''))
-            lead.utm_campaign = request.GET.get('utm_campaign', request.POST.get('utm_campaign', ''))
+            # Truncar a max_length=100: una UTM larga causaba error 500 en PostgreSQL
+            for campo in ('utm_source', 'utm_medium', 'utm_campaign'):
+                valor = request.GET.get(campo, request.POST.get(campo, ''))
+                setattr(lead, campo, str(valor).strip()[:100])
 
             diag = request.session.get('diagnostico', {})
-            lead.situacion          = _val_choice(diag.get('situacion'),        VALID_SITUACION)
+            # Formularios sin diagnóstico previo (p. ej. landings de clínica) envían
+            # situacion/clinica_preferente en el POST; se validan contra las opciones.
+            lead.situacion          = _val_choice(diag.get('situacion') or request.POST.get('situacion'), VALID_SITUACION)
             lead.renta              = _val_int(diag.get('renta'),        0, 10_000_000)
             lead.cargas             = _val_choice(diag.get('cargas'),           VALID_CARGAS)
-            lead.clinica_preferente = _val_choice(diag.get('clinica'),          VALID_CLINICA)
+            lead.clinica_preferente = _val_choice(diag.get('clinica') or request.POST.get('clinica_preferente'), VALID_CLINICA)
             lead.prevision_actual   = _val_choice(diag.get('prevision_actual'), VALID_PREVISION)
             lead.pago_actual        = _val_int(diag.get('pago_actual'),  0, 5_000_000)
             lead.preferencia        = _val_choice(diag.get('preferencia'),      VALID_PREFERENCIA)
@@ -98,6 +101,8 @@ def nuevo_lead(request):
             rl.set(cache_key, intentos + 1, 600)
 
             request.session['lead_nombre'] = lead.nombre
+            # Marca de un solo uso: /gracias/ dispara fbq('track','Lead') y la consume.
+            request.session['meta_lead_event'] = f'lead-{lead.pk}'
             notificar_asesor(lead)
 
             return JsonResponse({'success': True, 'redirect': '/gracias/'})

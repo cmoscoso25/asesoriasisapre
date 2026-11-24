@@ -624,10 +624,7 @@
     const params = new URLSearchParams();
     data.forEach((v, k) => params.append(k, v));
 
-    const urlParams = new URLSearchParams(window.location.search);
-    ['utm_source', 'utm_medium', 'utm_campaign'].forEach(k => {
-      if (urlParams.get(k)) params.append(k, urlParams.get(k));
-    });
+    appendUtms(params);
 
     try {
       const res  = await fetch('/leads/nuevo/', {
@@ -665,6 +662,30 @@
       btn.innerHTML = '✓ Quiero mi cotización gratis';
     }
   }
+
+  // ── UTM: se guardan al llegar (sessionStorage) para no perderlas si el
+  //    visitante navega a otra página antes de enviar el formulario ──
+  const UTM_KEYS = ['utm_source', 'utm_medium', 'utm_campaign'];
+  function storeUtms() {
+    try {
+      const q = new URLSearchParams(window.location.search);
+      if (UTM_KEYS.some(k => q.get(k))) {
+        const utms = {};
+        UTM_KEYS.forEach(k => { if (q.get(k)) utms[k] = q.get(k).slice(0, 100); });
+        sessionStorage.setItem('utms', JSON.stringify(utms));
+      }
+    } catch (e) { /* almacenamiento no disponible */ }
+  }
+  function appendUtms(params) {
+    let utms = {};
+    try { utms = JSON.parse(sessionStorage.getItem('utms') || '{}'); } catch (e) { utms = {}; }
+    const q = new URLSearchParams(window.location.search);
+    UTM_KEYS.forEach(k => {
+      const v = q.get(k) || utms[k];
+      if (v) params.set(k, String(v).slice(0, 100));
+    });
+  }
+  window.asesoriaUtms = { append: appendUtms };
 
   function getCookie(name) {
     const v     = `; ${document.cookie}`;
@@ -799,10 +820,7 @@
       btn.innerHTML = '<span class="spinner"></span> Enviando...';
 
       const params    = new URLSearchParams(new FormData(formFinal));
-      const urlParams = new URLSearchParams(window.location.search);
-      ['utm_source', 'utm_medium', 'utm_campaign'].forEach(k => {
-        if (urlParams.get(k)) params.append(k, urlParams.get(k));
-      });
+      appendUtms(params);
 
       try {
         const res  = await fetch('/leads/nuevo/', {
@@ -1017,6 +1035,8 @@
   }
 
   // ── Init ──
+  storeUtms();
+
   document.addEventListener('DOMContentLoaded', function () {
     renderPaso();
     initFAQ();

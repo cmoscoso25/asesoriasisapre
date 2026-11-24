@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse
+from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import ensure_csrf_cookie
 from leads.diagnostico import PLANES_DB, UF
 
@@ -44,9 +45,16 @@ def landing(request):
     return render(request, 'core/landing.html')
 
 
+@never_cache
 def gracias(request):
     lead_nombre = request.session.get('lead_nombre', '')
-    return render(request, 'core/gracias.html', {'lead_nombre': lead_nombre})
+    # Se consume la marca: el evento Lead se dispara una sola vez por lead
+    # (no al recargar ni al abrir /gracias/ directamente).
+    meta_lead_event = request.session.pop('meta_lead_event', '')
+    return render(request, 'core/gracias.html', {
+        'lead_nombre': lead_nombre,
+        'meta_lead_event': meta_lead_event,
+    })
 
 
 def privacidad(request):

@@ -74,5 +74,6 @@
 
 {% block extra_scripts %}
 {% load static %}
+{% if meta_lead_event %}<div id="meta-lead" data-event-id="{{ meta_lead_event }}" hidden></div>{% endif %}
 <script src="{% static 'js/gracias.js' %}" defer></script>
 {% endblock %}
