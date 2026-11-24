@@ -82,7 +82,7 @@ py manage.py collectstatic --no-input
 - Solo usuarios con `is_staff=True` (decorador `@staff_required` en `gestion/views.py`)
 - Login redirige a `/gestion-interna/login/`
 - Sincronización Outlook: opcional, requiere `MICROSOFT_CLIENT_ID` configurado
-- Tests: `py manage.py test leads gestion` — 65 tests, todos deben pasar
+- Tests: `py manage.py test leads gestion` — 74 tests, todos deben pasar
 - Todas las vistas con `@staff_required` son `never_cache` (datos personales)
 - Cron: `/gestion/cron/recordatorios/` autentica con cabecera `X-Cron-Secret` (el `?secret=` en URL es legado y registra un warning)
 
@@ -95,7 +95,11 @@ py manage.py collectstatic --no-input
 
 ## Integración Lead → Prospecto
 
-Signal en `gestion/signals.py`: cuando se crea un `Lead` desde el formulario web, se crea automáticamente un `Prospecto` en el CRM. Dedup por teléfono y email.
+Signal en `gestion/signals.py` → `gestion/services/leads_crm.py` (`sincronizar_lead`):
+- Persona nueva → se crea `Prospecto` (origen según `utm_source`: meta/fb → facebook, ig → instagram).
+- Persona existente (mismo celular por últimos 9 dígitos, o mismo email) → NO se duplica: nota automática en su ficha, prioridad Alta, seguimiento hoy, se reactiva si estaba archivada/cerrada.
+- El email al asesor avisa "🔁 Repetido" o "⚠️ SIN FICHA CRM" si falló.
+- Recuperar leads sin ficha: acción "Crear ficha en el CRM" en el admin de Leads (filtro "ficha en CRM") o `py manage.py sincronizar_leads_crm --dry-run` (sin `--dry-run` para aplicar). La recuperación no agrega notas ni toca fichas existentes.
 
 ## Supabase / RLS
 

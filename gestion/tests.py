@@ -443,3 +443,88 @@ class CRMNoCacheTest(TestCase):
         self.client.force_login(make_staff())
         resp = self.client.get(reverse('gestion:dashboard'))
         self.assertIn('no-store', resp['Cache-Control'])
+
+
+# ── Sincronización Lead → CRM: repetidos, teléfonos, recuperación ────────
+
+class LeadsCRMTest(TestCase):
+
+    def test_telefono_con_formato_distinto_es_el_mismo(self):
+        Prospecto.objects.create(nombre='Existente', telefono='+56 9 8247 9504')
+        Lead.objects.create(nombre='Nuevo', telefono='982479504')
+        self.assertEqual(Prospecto.objects.count(), 1)
+
+    def test_repetido_agrega_nota_y_prioriza(self):
+        p = Prospecto.objects.create(nombre='Existente', telefono='+56982479504', prioridad='baja')
+        lead = Lead.objects.create(nombre='Existente', telefono='982479504', situacion='isapre-cara',
+                                   utm_source='meta', utm_medium='paid_social')
+        p.refresh_from_db()
+        self.assertEqual(p.prioridad, 'alta')
+        self.assertEqual(p.proximo_seguimiento, timezone.localdate())
+        self.assertEqual(p.lead, lead)
+        nota = GestionProspecto.objects.get(prospecto=p)
+        self.assertEqual(nota.tipo, 'nota')
+        self.assertIn(f'Lead #{lead.pk}', nota.descripcion)
+        self.assertIn('meta/paid_social', nota.descripcion)
+        self.assertEqual(lead._crm_resultado, 'existente')
+
+    def test_repetido_reactiva_ficha_archivada_y_cerrada(self):
+        p = Prospecto.objects.create(nombre='X', telefono='911111111', activo=False, estado='no_concretado')
+        Lead.objects.create(nombre='X', telefono='911111111')
+        p.refresh_from_db()
+        self.assertTrue(p.activo)
+        self.assertEqual(p.estado, 'nuevo')
+        self.assertIn('reactivada', GestionProspecto.objects.get(prospecto=p).descripcion)
+
+    def test_origen_segun_utm(self):
+        Lead.objects.create(nombre='A', telefono='911111112', utm_source='meta')
+        Lead.objects.create(nombre='B', telefono='911111113', utm_source='ig')
+        self.assertEqual(Prospecto.objects.get(telefono='911111112').origen, 'facebook')
+        self.assertEqual(Prospecto.objects.get(telefono='911111113').origen, 'instagram')
+
+    def test_error_en_crm_no_impide_guardar_lead(self):
+        from unittest import mock
+        with mock.patch('gestion.services.leads_crm.sincronizar_lead', side_effect=RuntimeError('boom')):
+            lead = Lead.objects.create(nombre='Z', telefono='922222222')
+        self.assertTrue(Lead.objects.filter(pk=lead.pk).exists())
+        self.assertEqual(lead._crm_resultado, 'error')
+
+    def _leads_sin_ficha(self):
+        """Simula leads anteriores al CRM: se crean y luego se borra su ficha."""
+        a = Lead.objects.create(nombre='Ricardo', telefono='998298055')
+        b = Lead.objects.create(nombre='Test', telefono='982479504')
+        c = Lead.objects.create(nombre='Test', telefono='982479504')  # misma persona
+        Prospecto.objects.all().delete()
+        GestionProspecto.objects.all().delete()
+        return a, b, c
+
+    def test_comando_dry_run_no_guarda(self):
+        from io import StringIO
+        from django.core.management import call_command
+        self._leads_sin_ficha()
+        out = StringIO()
+        call_command('sincronizar_leads_crm', '--dry-run', stdout=out)
+        self.assertEqual(Prospecto.objects.count(), 0)
+        self.assertIn('Fichas a crear: 2', out.getvalue())
+
+    def test_comando_crea_fichas_sin_duplicar_ni_notas(self):
+        from django.core.management import call_command
+        from io import StringIO
+        self._leads_sin_ficha()
+        call_command('sincronizar_leads_crm', stdout=StringIO())
+        self.assertEqual(Prospecto.objects.count(), 2)
+        self.assertEqual(GestionProspecto.objects.count(), 0)
+        call_command('sincronizar_leads_crm', stdout=StringIO())  # idempotente
+        self.assertEqual(Prospecto.objects.count(), 2)
+
+    def test_accion_admin_crea_ficha(self):
+        admin_user = User.objects.create_superuser('root', 'r@x.cl', 'pass')
+        self.client.force_login(admin_user)
+        ricardo, _, _ = self._leads_sin_ficha()
+        resp = self.client.post('/gestion-interna/leads/lead/', {
+            'action': 'crear_ficha_crm', '_selected_action': [ricardo.pk],
+        }, follow=True)
+        self.assertContains(resp, 'Fichas creadas: 1')
+        self.assertEqual(Prospecto.objects.get().lead, ricardo)
+        lista = self.client.get('/gestion-interna/leads/lead/?en_crm=no')
+        self.assertContains(lista, 'Sin ficha')

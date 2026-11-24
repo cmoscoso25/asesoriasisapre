@@ -64,9 +64,25 @@ def _enviar_notificacion(lead):
     wa_link = escape(f"https://wa.me/56{telefono}?text={quote(saludo)}")
     email_link = escape(f"mailto:{quote(lead.email or '', safe='@')}")
 
-    prospecto = getattr(lead, 'prospecto', None)
+    # Resultado de la sincronización con el CRM (gestion/signals.py)
+    crm_resultado = getattr(lead, '_crm_resultado', '')
+    prospecto = getattr(lead, '_crm_prospecto', None) or getattr(lead, 'prospecto', None)
     crm_url = (f"https://asesoriasisapres.com/gestion/prospectos/{prospecto.pk}/"
                if prospecto else f"https://asesoriasisapres.com/gestion-interna/leads/lead/{lead.pk}/change/")
+    if crm_resultado == 'error':
+        aviso_crm = ('#FEE2E2', '#991B1B',
+                     '⚠️ No se pudo crear la ficha en el CRM. Revisa el lead en el admin y créala manualmente.')
+    elif crm_resultado == 'existente':
+        aviso_crm = ('#FEF3C7', '#92400E',
+                     '🔁 Contacto repetido: esta persona ya estaba en el CRM. Se agregó una nota a su ficha '
+                     'y quedó con prioridad Alta y seguimiento para hoy.')
+    else:
+        aviso_crm = None
+    aviso_html = (
+        f'<div style="background:{aviso_crm[0]};color:{aviso_crm[1]};padding:12px 16px;border-radius:8px;'
+        f'font-size:14px;margin-bottom:16px;">{escape(aviso_crm[2])}</div>'
+        if aviso_crm else ''
+    )
 
     fecha_txt = lead.creado.strftime('%d/%m/%Y %H:%M') if lead.creado else "—"
 
@@ -103,6 +119,7 @@ def _enviar_notificacion(lead):
       </div>
       <div style="background:#f7f8fa;padding:24px;border-radius:0 0 12px 12px;
                   border:1px solid #e2e8f0;border-top:none;">
+        {aviso_html}
         <table style="width:100%;border-collapse:collapse;">
           {filas_html}
         </table>
@@ -130,7 +147,11 @@ def _enviar_notificacion(lead):
     payload = {
         "from": from_email,
         "to": destinatarios,
-        "subject": f"[Lead #{lead.id}] {lead.nombre} — {situacion_txt}",
+        "subject": (
+            ("⚠️ SIN FICHA CRM · " if crm_resultado == 'error' else
+             "🔁 Repetido · " if crm_resultado == 'existente' else "")
+            + f"[Lead #{lead.id}] {lead.nombre} — {situacion_txt}"
+        ),
         "html": html,
     }
     headers = {

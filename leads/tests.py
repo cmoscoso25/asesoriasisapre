@@ -203,3 +203,13 @@ class EmailAsesorTest(TestCase):
         self.assertNotIn('Renta', html)
         self.assertIn('https://wa.me/56912345678?text=', html)
         self.assertIn('/gestion/prospectos/', html)
+
+    @mock.patch.dict('os.environ', {'RESEND_API_KEY': 'test-key', 'ASESOR_EMAILS': 'asesor@ejemplo.cl'})
+    @mock.patch('leads.notifications.requests.post')
+    def test_email_avisa_contacto_repetido(self, post):
+        from gestion.models import Prospecto
+        Prospecto.objects.create(nombre='Persona Prueba', telefono='+56912345678')
+        self.client.post('/leads/nuevo/', DATOS_VALIDOS)
+        payload = post.call_args.kwargs['json']
+        self.assertTrue(payload['subject'].startswith('🔁 Repetido'))
+        self.assertIn('Contacto repetido', payload['html'])
