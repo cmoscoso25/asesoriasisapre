@@ -1,11 +1,17 @@
 import os
 import logging
+from html import escape
+from urllib.parse import quote
+
 import requests
 
 logger = logging.getLogger(__name__)
 
 
-def _fila(label, valor, bold=False, color=None):
+def _fila(label, valor, bold=False, color=None, es_html=False):
+    # Todo valor de usuario se escapa; solo HTML construido aquí usa es_html=True
+    if not es_html:
+        valor = escape(valor)
     val_style = f"font-weight:{'600' if bold else '400'};font-size:14px;"
     if color:
         val_style += f"color:{color};"
@@ -40,7 +46,8 @@ def _enviar_notificacion(lead):
     destinatarios = [e.strip() for e in emails_raw.split(',') if e.strip()]
     logger.info("Preparando email lead #%s -> %s", lead.id, destinatarios)
 
-    renta_fmt = f"${lead.renta:,}".replace(',', '.') if lead.renta else "No indicada"
+    # Minimización de datos: el email NO incluye RUT ni renta (quedan solo en el
+    # CRM, que exige login). El correo pasa por terceros y queda en buzones.
     pago_fmt = f"${lead.pago_actual:,}".replace(',', '.') + "/mes" if lead.pago_actual else "—"
     ahorro_txt = lead.ahorro_display
 
@@ -51,28 +58,30 @@ def _enviar_notificacion(lead):
     clinica_txt = lead.get_clinica_preferente_display() if lead.clinica_preferente else "—"
     situacion_txt = lead.get_situacion_display() if lead.situacion else "—"
 
-    nombre_safe = (lead.nombre or '').replace(' ', '+')
-    wa_link = (
-        f"https://wa.me/569{lead.telefono}"
-        f"?text=Hola+{nombre_safe}%2C+soy+asesor+de"
-        f"+Asesor%C3%ADasIsapres.com+y+quiero+ayudarte."
-    )
+    telefono = ''.join(filter(str.isdigit, lead.telefono or ''))
+    saludo = 'Hola {}, soy asesor de AsesoríasIsapres.com y quiero ayudarte.'.format(lead.nombre or '')
+    # telefono se guarda como 9XXXXXXXX (9 dígitos) → número internacional 56 9XXXXXXXX
+    wa_link = escape(f"https://wa.me/56{telefono}?text={quote(saludo)}")
+    email_link = escape(f"mailto:{quote(lead.email or '', safe='@')}")
+
+    prospecto = getattr(lead, 'prospecto', None)
+    crm_url = (f"https://asesoriasisapres.com/gestion/prospectos/{prospecto.pk}/"
+               if prospecto else f"https://asesoriasisapres.com/gestion-interna/leads/lead/{lead.pk}/change/")
 
     fecha_txt = lead.creado.strftime('%d/%m/%Y %H:%M') if lead.creado else "—"
 
     filas_html = (
         _fila("Nombre", lead.nombre, bold=True) +
-        _fila("RUT", f'{lead.rut} <span style="color:#1D9E75;font-size:12px;">&#10003; Verificado</span>') +
         _fila("Celular / WhatsApp",
               f'<a href="{wa_link}" style="color:#0C447C;">'
-              f'+569 {lead.telefono}</a>'
-              f' <span style="color:#1D9E75;font-size:12px;">&#10003; Verificado</span>') +
+              f'+56 {escape(telefono)}</a>'
+              f' <span style="color:#1D9E75;font-size:12px;">&#10003; Verificado</span>',
+              es_html=True) +
         _fila("Email", lead.email or "—") +
         _fila("Edad", edad_txt) +
         _fila("Región", lead.get_region_display() if lead.region else "—") +
         _fila("Situación actual", situacion_txt) +
         _fila("Previsión actual", prevision_label) +
-        _fila("Renta imponible", renta_fmt) +
         _fila("Pago actual ISAPRE", pago_fmt) +
         _fila("Preferencia", preferencia_label) +
         _fila("Cargas familiares", cargas_txt) +
@@ -103,12 +112,16 @@ def _enviar_notificacion(lead):
                     text-decoration:none;font-weight:600;display:inline-block;font-size:14px;">
             &#128172; WhatsApp
           </a>
-          <a href="mailto:{lead.email}"
+          <a href="{email_link}"
              style="background:#0C447C;color:white;padding:12px 20px;border-radius:8px;
                     text-decoration:none;font-weight:600;display:inline-block;font-size:14px;">
             &#128140; Email
           </a>
         </div>
+        <p style="margin-top:20px;font-size:13px;color:#64748b;">
+          RUT, renta y diagnóstico completo en el CRM (requiere iniciar sesión):<br>
+          <a href="{escape(crm_url)}" style="color:#0C447C;">Ver ficha del prospecto &rarr;</a>
+        </p>
       </div>
     </div>
     """

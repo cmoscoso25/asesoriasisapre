@@ -6,7 +6,10 @@ load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-DEBUG = os.environ.get('DEBUG', 'True') == 'True'
+# Falla en modo seguro: en Render (variable RENDER definida por la plataforma)
+# DEBUG es False salvo que se pida explícitamente DEBUG=True. En local, True.
+_debug_por_defecto = 'False' if os.environ.get('RENDER') else 'True'
+DEBUG = os.environ.get('DEBUG', _debug_por_defecto) == 'True'
 
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-dev-key-local-only' if DEBUG else '')
 if not SECRET_KEY:
@@ -34,6 +37,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'core.security.SecurityHeadersMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'csp.middleware.CSPMiddleware',
@@ -205,7 +209,13 @@ AXES_ENABLED = True
 AXES_FAILURE_LIMIT = 5
 AXES_COOLOFF_TIME = 1  # horas de bloqueo tras 5 intentos fallidos
 AXES_RESET_ON_SUCCESS = True
-AXES_META_PRECEDENCE_ORDER = ['HTTP_X_FORWARDED_FOR', 'REMOTE_ADDR']
+# IP real vía CF-Connecting-IP (Cloudflare); X-Forwarded-For era falsificable
+# y permitía esquivar el bloqueo cambiando la IP en cada intento.
+AXES_CLIENT_IP_CALLABLE = 'core.security.get_client_ip'
+
+# Dominio canónico: el subdominio de Render redirige 301 aquí
+CANONICAL_HOST = 'asesoriasisapres.com'
+CANONICAL_REDIRECT_HOSTS = ('asesoriasisapre.onrender.com',)
 
 # Content Security Policy
 CSP_DEFAULT_SRC     = ("'self'",)

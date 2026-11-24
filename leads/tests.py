@@ -127,3 +127,79 @@ class MetaPixelTest(TestCase):
         import re
         for tag in re.findall(r'<script(?![^>]*\bsrc=)([^>]*)>', html):
             self.assertIn('application/ld+json', tag)
+
+
+# ── Seguridad ─────────────────────────────────────────────────────────────
+
+from django.test import RequestFactory  # noqa: E402
+from unittest import mock  # noqa: E402
+from core.security import get_client_ip  # noqa: E402
+
+
+class ClientIPTest(DjangoTestCase):
+
+    def setUp(self):
+        self.rf = RequestFactory()
+
+    def test_prefiere_cf_connecting_ip_sobre_xff_falsificado(self):
+        req = self.rf.get('/', HTTP_CF_CONNECTING_IP='200.1.2.3',
+                          HTTP_X_FORWARDED_FOR='1.1.1.1, 200.1.2.3', REMOTE_ADDR='10.0.0.1')
+        self.assertEqual(get_client_ip(req), '200.1.2.3')
+
+    def test_respaldo_xff_y_remote_addr(self):
+        self.assertEqual(get_client_ip(self.rf.get('/', HTTP_X_FORWARDED_FOR='8.8.8.8, 10.0.0.1')), '8.8.8.8')
+        self.assertEqual(get_client_ip(self.rf.get('/', REMOTE_ADDR='10.0.0.9')), '10.0.0.9')
+
+    def test_valores_invalidos_se_ignoran(self):
+        req = self.rf.get('/', HTTP_CF_CONNECTING_IP='<script>', REMOTE_ADDR='10.0.0.9')
+        self.assertEqual(get_client_ip(req), '10.0.0.9')
+
+    def test_axes_usa_la_misma_funcion(self):
+        from axes.helpers import get_client_ip_address
+        req = self.rf.get('/', HTTP_CF_CONNECTING_IP='200.1.2.3', HTTP_X_FORWARDED_FOR='1.1.1.1')
+        self.assertEqual(get_client_ip_address(req), '200.1.2.3')
+
+
+@override_settings(CACHES=CACHES_TEST)
+class RateLimitTest(TestCase):
+
+    def test_cambiar_xff_no_esquiva_el_limite(self):
+        for i in range(3):
+            self.client.post('/leads/nuevo/', DATOS_VALIDOS, HTTP_CF_CONNECTING_IP='200.1.2.3',
+                             HTTP_X_FORWARDED_FOR=f'1.1.1.{i}')
+        resp = self.client.post('/leads/nuevo/', DATOS_VALIDOS, HTTP_CF_CONNECTING_IP='200.1.2.3',
+                                HTTP_X_FORWARDED_FOR='1.1.1.99')
+        self.assertEqual(resp.status_code, 429)
+
+
+@override_settings(CACHES=CACHES_TEST, ALLOWED_HOSTS=['asesoriasisapres.com', 'asesoriasisapre.onrender.com', 'testserver'])
+class SecurityHeadersTest(TestCase):
+
+    def test_permissions_policy(self):
+        resp = self.client.get('/privacidad/')
+        self.assertIn('camera=()', resp['Permissions-Policy'])
+        self.assertIn('geolocation=()', resp['Permissions-Policy'])
+
+    def test_onrender_redirige_al_dominio_canonico(self):
+        resp = self.client.get('/comparar-isapres-chile/?utm_source=x', HTTP_HOST='asesoriasisapre.onrender.com')
+        self.assertEqual(resp.status_code, 301)
+        self.assertEqual(resp['Location'], 'https://asesoriasisapres.com/comparar-isapres-chile/?utm_source=x')
+
+    def test_dominio_principal_no_redirige(self):
+        resp = self.client.get('/privacidad/', HTTP_HOST='asesoriasisapres.com')
+        self.assertEqual(resp.status_code, 200)
+
+
+@override_settings(CACHES=CACHES_TEST)
+class EmailAsesorTest(TestCase):
+
+    @mock.patch.dict('os.environ', {'RESEND_API_KEY': 'test-key', 'ASESOR_EMAILS': 'asesor@ejemplo.cl'})
+    @mock.patch('leads.notifications.requests.post')
+    def test_email_sin_rut_ni_renta_y_whatsapp_correcto(self, post):
+        self.client.post('/leads/nuevo/', DATOS_VALIDOS)
+        html = post.call_args.kwargs['json']['html']
+        self.assertNotIn('11111111-1', html)
+        self.assertNotIn('RUT</td>', html)
+        self.assertNotIn('Renta', html)
+        self.assertIn('https://wa.me/56912345678?text=', html)
+        self.assertIn('/gestion/prospectos/', html)

@@ -20,6 +20,10 @@ Sitio web Django para asesoría de isapres en Chile. Deploy automático: GitHub 
 - Credenciales DB solo desde variables de entorno
 - `SECURE_*` y cookies seguras se activan solo cuando `DEBUG=False`
 - Rate limit leads: máx 3 envíos/IP/10 min vía `DatabaseCache`
+- IP del cliente: siempre `core.security.get_client_ip` (usa `CF-Connecting-IP` de Cloudflare; `X-Forwarded-For` es falsificable). También la usa django-axes (`AXES_CLIENT_IP_CALLABLE`)
+- `DEBUG` es `False` por defecto en Render (variable `RENDER`); `True` solo en local
+- `asesoriasisapre.onrender.com` redirige 301 a `asesoriasisapres.com` (`core.security.SecurityHeadersMiddleware`, que además envía `Permissions-Policy`)
+- El email de nuevo lead NO incluye RUT ni renta: solo enlace a la ficha del CRM
 - Tokens Microsoft OAuth en campo de DB — no en logs
 
 ## Variables de entorno (Render)
@@ -78,7 +82,9 @@ py manage.py collectstatic --no-input
 - Solo usuarios con `is_staff=True` (decorador `@staff_required` en `gestion/views.py`)
 - Login redirige a `/gestion-interna/login/`
 - Sincronización Outlook: opcional, requiere `MICROSOFT_CLIENT_ID` configurado
-- Tests: `py manage.py test leads gestion` — 50 tests, todos deben pasar
+- Tests: `py manage.py test leads gestion` — 65 tests, todos deben pasar
+- Todas las vistas con `@staff_required` son `never_cache` (datos personales)
+- Cron: `/gestion/cron/recordatorios/` autentica con cabecera `X-Cron-Secret` (el `?secret=` en URL es legado y registra un warning)
 
 ## Meta Pixel
 

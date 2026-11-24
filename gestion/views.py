@@ -11,6 +11,7 @@ from django.db.models import Count, Q
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
+from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_POST
 
 from .forms import GestionForm, ProspectoForm, ReunionForm, TareaForm
@@ -36,7 +37,8 @@ def staff_required(view_func):
         if not request.user.is_staff:
             raise PermissionDenied
         return view_func(request, *args, **kwargs)
-    return _wrapped
+    # Páginas con datos personales: ni la caché del sitio ni el navegador las guardan
+    return never_cache(_wrapped)
 
 
 def _ctx_base(request):
@@ -606,14 +608,22 @@ def outlook_desconectar(request):
 # Cron endpoint (llamado por cron-job.org cada 5 min)
 # ---------------------------------------------------------------------------
 
+@never_cache  # sin esto la caché global (600 s) servía respuestas viejas y saltaba ejecuciones
 def cron_recordatorios(request):
+    import hmac
     import os
     from io import StringIO
     from django.core.management import call_command
+    from django.http import HttpResponseForbidden
 
     secret = os.environ.get('CRON_SECRET', '')
-    if not secret or request.GET.get('secret') != secret:
-        from django.http import HttpResponseForbidden
+    # Preferido: cabecera "X-Cron-Secret" (no queda en los logs de acceso).
+    # Legado: ?secret= en la URL, se mantiene mientras se actualiza cron-job.org.
+    enviado = request.headers.get('X-Cron-Secret', '')
+    if not enviado and request.GET.get('secret'):
+        enviado = request.GET['secret']
+        logger.warning("cron_recordatorios: secreto recibido en la URL; configurar la cabecera X-Cron-Secret en cron-job.org")
+    if not secret or not hmac.compare_digest(enviado.encode(), secret.encode()):
         return HttpResponseForbidden('Forbidden')
 
     out = StringIO()

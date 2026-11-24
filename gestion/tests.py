@@ -396,3 +396,50 @@ class AsegurarRLSTest(TestCase):
              mock.patch.object(db_security.transaction, 'atomic', lambda using=None: nullcontext()):
             self.assertEqual(db_security.asegurar_rls(), [])
         self.assertFalse(any('REVOKE' in s for s in ejecutadas))
+
+
+# ── Cron recordatorios: autenticación y caché ────────────────────────────
+
+class CronRecordatoriosTest(TestCase):
+    URL = '/gestion/cron/recordatorios/'
+
+    def setUp(self):
+        from django.core.cache import caches
+        for c in caches.all():
+            c.clear()
+
+    def _env(self, valor='s3creto'):
+        from unittest import mock
+        return mock.patch.dict('os.environ', {'CRON_SECRET': valor})
+
+    def test_cabecera_correcta(self):
+        with self._env():
+            resp = self.client.get(self.URL, HTTP_X_CRON_SECRET='s3creto')
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn('no-store', resp['Cache-Control'])
+
+    def test_sin_secreto_o_incorrecto_403(self):
+        with self._env():
+            self.assertEqual(self.client.get(self.URL).status_code, 403)
+            self.assertEqual(self.client.get(self.URL, HTTP_X_CRON_SECRET='otro').status_code, 403)
+
+    def test_respuesta_no_queda_en_cache_para_peticiones_sin_secreto(self):
+        with self._env():
+            self.client.get(self.URL, HTTP_X_CRON_SECRET='s3creto')
+            self.assertEqual(self.client.get(self.URL).status_code, 403)
+
+    def test_query_string_legado_sigue_funcionando(self):
+        with self._env():
+            self.assertEqual(self.client.get(self.URL + '?secret=s3creto').status_code, 200)
+
+    def test_sin_cron_secret_configurado_403(self):
+        with self._env(''):
+            self.assertEqual(self.client.get(self.URL, HTTP_X_CRON_SECRET='').status_code, 403)
+
+
+class CRMNoCacheTest(TestCase):
+
+    def test_paginas_crm_no_se_guardan_en_cache(self):
+        self.client.force_login(make_staff())
+        resp = self.client.get(reverse('gestion:dashboard'))
+        self.assertIn('no-store', resp['Cache-Control'])
